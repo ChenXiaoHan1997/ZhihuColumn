@@ -19,7 +19,7 @@ public class MainpagePresenter {
     private ColumnEntityDao mColumnEntityDao;
     private Handler mUiHandler;
 
-    private String[] columnsSlugs = new String[] {"qiechihe", "c_134408063", "h4cj250", "huizi", "kaede", "zhangjiawei"};
+    private String[] columnsSlugs = new String[] {"zhaohaoyang", "542b2333", "qiechihe", "c_134408063", "h4cj250", "huizi", "kaede", "zhangjiawei"};
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
