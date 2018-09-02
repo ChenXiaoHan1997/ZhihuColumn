@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ZhihuZhuanlan</string>
+    <string name="posts_count">共 %d 篇文章</string>
+    <string name="followers_count">%d 人关注</string>
+    <string name="likes_count">%d 赞</string>
 </resources>
