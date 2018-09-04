@@ -27,8 +27,9 @@ public class ArticleListPagePresenter {
         mUiHandler = new Handler();
     }
 
-    public void loadArticleList(final String columnSlug) {
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug + "/" + HttpUtil.POSTS, new HttpUtil.HttpListener() {
+    public void loadArticleList(final String columnSlug, int offset) {
+        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug + "/" + HttpUtil.POSTS + "?offset=" + offset,
+                new HttpUtil.HttpListener() {
             @Override
             public void onSuccess(String response) {
                 List<Article> articlesList = JsonUtil.decodeArticleList(response);

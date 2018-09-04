@@ -21,5 +21,6 @@
         android:layout_marginBottom="4dp"
         android:layout_marginTop="6dp"
         android:gravity="center"
+        android:text="@string/no_more"
         android:textColor="@color/gray" />
 </FrameLayout>

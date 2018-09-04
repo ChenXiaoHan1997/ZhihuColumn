@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.bean.Article;
@@ -24,11 +25,14 @@ public class JsonUtil {
     }
 
     public static List<Article> decodeArticleList(String json) {
+        List<Article> articleList = new ArrayList<>();
         json = "{articleList:" + json + "}";
         Log.d("cxh", json);
         Gson gson = new Gson();
         RawPostListJson rawPostListJson = gson.fromJson(json, RawPostListJson.class);
-        List<Article> articleList = rawPostListJson.getArticleList();
+        if (rawPostListJson != null) {
+            articleList = rawPostListJson.getArticleList();
+        }
         return articleList;
     }
 

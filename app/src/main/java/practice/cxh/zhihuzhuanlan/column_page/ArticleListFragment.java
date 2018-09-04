@@ -57,19 +57,26 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
         Intent intent = getActivity().getIntent();
         mColumnEntity = (ColumnEntity) intent.getSerializableExtra(ArticleListActivity.COLUMN_ENTITY);
         mPresenter = new ArticleListPagePresenter(this);
-        mPresenter.loadArticleList(mColumnEntity.getSlug());
+        mPresenter.loadArticleList(mColumnEntity.getSlug(), 0);
+        rvArticles.addOnScrollListener(mEndlessRecyclerOnScrollListener);
     }
 
     @Override
     public void onArticleListLoaded(List<ArticleEntity> articleEntityList) {
         mArticleEntityList.addAll(articleEntityList);
+        mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
         mAdapter.notifyDataSetChanged();
     }
 
     private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
         @Override
         public void onLoadMore() {
-
+            mAdapter.setLoadState(ArticleEntityAdapter.LOADING);
+            if (mArticleEntityList.size() < mColumnEntity.getPostsCount()) {
+                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size());
+            } else {
+                mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
+            }
         }
     };
 }
