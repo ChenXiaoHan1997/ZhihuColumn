@@ -7,6 +7,7 @@
     <color name="whiteSmoke">#F5F5F5</color>
     <color name="gainsboro">#DCDCDC</color>
     <color name="gray">#A9A9A9</color>
+    <color name="dimGray">#696969</color>
     <color name="black">#000000</color>
     <color name="lime">#00FF00</color>
     <color name="limeGreen">#32CD32</color>

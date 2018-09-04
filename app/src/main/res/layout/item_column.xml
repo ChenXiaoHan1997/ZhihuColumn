@@ -39,6 +39,7 @@
             android:layout_toRightOf="@id/iv_pic"
             android:ellipsize="end"
             android:maxLines="2"
+            android:textColor="@color/dimGray"
             android:textSize="14sp" />
 
         <TextView
