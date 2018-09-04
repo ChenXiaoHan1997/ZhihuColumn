@@ -70,16 +70,7 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
         mAppBar = mLayoutRoot.findViewById(R.id.app_bar);
         mHeader = mLayoutRoot.findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = mLayoutRoot.findViewById(R.id.collapsing_toolbar);
-        mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (verticalOffset <= -mHeader.getHeight() / 2) {
-                    mCollapsingToolbarLayout.setTitle(mColumnEntity.getName());
-                } else {
-                    mCollapsingToolbarLayout.setTitle("");
-                }
-            }
-        });
+        mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
         tvName = mLayoutRoot.findViewById(R.id.tv_name);
         tvName.setText(mColumnEntity.getName());
         ivAvatar = mLayoutRoot.findViewById(R.id.iv_avatar);
@@ -104,6 +95,17 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
         mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
         mAdapter.notifyDataSetChanged();
     }
+
+    private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
+        @Override
+        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+            if (verticalOffset <= -mHeader.getHeight() / 2) {
+                mCollapsingToolbarLayout.setTitle(mColumnEntity.getName());
+            } else {
+                mCollapsingToolbarLayout.setTitle("");
+            }
+        }
+    };
 
     private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
         @Override
