@@ -23,7 +23,7 @@ public class MainpagePresenter {
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
-        mHttpUtil = new HttpUtil(mActivity);
+        mHttpUtil = new HttpUtil(mActivity.getApplicationContext());
         mColumnEntityDao = ((ZhihuZhuanlanApplication) mActivity.getApplication()).getDaoSession().getColumnEntityDao();
         mUiHandler = new Handler(mActivity.getMainLooper());
     }

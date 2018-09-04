@@ -9,6 +9,10 @@ import practice.cxh.zhihuzhuanlan.bean.Article;
 @Entity
 public class ArticleEntity {
 
+    public static final int NO_CACHE = 0;
+    public static final int DOWNLOADING = 1;
+    public static final int DOWNLOAD_SUCCEED = 2;
+
     @Id
     private String slug;
     private String columnSlug;
@@ -17,12 +21,14 @@ public class ArticleEntity {
     private String titleImage;
     private String summary;
     private int likesCount;
+    private int downloadState;
 
 
 
-    @Generated(hash = 466150592)
+    @Generated(hash = 1479153391)
     public ArticleEntity(String slug, String columnSlug, String title,
-            String publishedTime, String titleImage, String summary, int likesCount) {
+            String publishedTime, String titleImage, String summary,
+            int likesCount, int downloadState) {
         this.slug = slug;
         this.columnSlug = columnSlug;
         this.title = title;
@@ -30,6 +36,7 @@ public class ArticleEntity {
         this.titleImage = titleImage;
         this.summary = summary;
         this.likesCount = likesCount;
+        this.downloadState = downloadState;
     }
 
     @Generated(hash = 1301498493)
@@ -113,5 +120,13 @@ public class ArticleEntity {
 
     public void setLikesCount(int likesCount) {
         this.likesCount = likesCount;
+    }
+
+    public int getDownloadState() {
+        return downloadState;
+    }
+
+    public void setDownloadState(int downloadState) {
+        this.downloadState = downloadState;
     }
 }

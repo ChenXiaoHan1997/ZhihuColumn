@@ -43,14 +43,28 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<ArticleEntityAdap
                 ArticleContentActivity.launch((Activity) mContext, articleEntity.getSlug());
             }
         });
-        holder.tvTitle.setText(articleEntity.getTitle());
-        holder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
-        holder.tvDate.setText(articleEntity.getPublishedTime());
         if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
             holder.ivPic.setVisibility(View.GONE);
         } else {
             Glide.with(mContext).load(articleEntity.getTitleImage()).into(holder.ivPic);
         }
+        holder.tvTitle.setText(articleEntity.getTitle());
+        holder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
+        holder.tvDate.setText(articleEntity.getPublishedTime());
+        switch (articleEntity.getDownloadState()) {
+            case ArticleEntity.DOWNLOAD_SUCCEED:
+                holder.tvState.setText(mContext.getString(R.string.downloaded));
+                holder.tvState.setTextColor(mContext.getResources().getColor(R.color.limeGreen));
+                break;
+            case ArticleEntity.DOWNLOADING:
+                holder.tvState.setText(mContext.getString(R.string.downloading));
+                holder.tvState.setTextColor(mContext.getResources().getColor(R.color.shaddleBrown));
+                break;
+            default:
+                break;
+
+        }
+
     }
 
     @Override
@@ -63,6 +77,7 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<ArticleEntityAdap
         TextView tvTitle;
         TextView tvLikesCount;
         TextView tvDate;
+        TextView tvState;
         ImageView ivPic;
 
         public ViewHolder(View itemView) {
@@ -70,6 +85,7 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<ArticleEntityAdap
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvLikesCount = itemView.findViewById(R.id.tv_likes_count);
             tvDate = itemView.findViewById(R.id.tv_date);
+            tvState = itemView.findViewById(R.id.tv_state);
             ivPic = itemView.findViewById(R.id.iv_pic);
         }
     }

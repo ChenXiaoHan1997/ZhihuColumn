@@ -23,7 +23,7 @@ public class ArticleListPagePresenter {
 
     public ArticleListPagePresenter(ArticleListActivity activity) {
         this.mActivity = activity;
-        mHttpUtil = new HttpUtil(mActivity);
+        mHttpUtil = new HttpUtil(mActivity.getApplicationContext());
         mArticleEntityDao = ((ZhihuZhuanlanApplication) mActivity.getApplication()).getDaoSession().getArticleEntityDao();
         mUiHandler = new Handler(mActivity.getMainLooper());
     }
@@ -37,10 +37,14 @@ public class ArticleListPagePresenter {
                 for (Article article : articlesList) {
                     ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article);
                     articleEntity.setColumnSlug(columnSlug);
+                    List<ArticleEntity> tmp = mArticleEntityDao.queryRaw("where " + ArticleEntityDao.Properties.Slug.columnName + " = ?", articleEntity.getSlug());
+                    if (tmp.size() > 0) {
+                        articleEntity.setDownloadState(tmp.get(0).getDownloadState());
+                    }
                     articleEntityList.add(articleEntity);
                 }
                 mActivity.onArticleListLoaded(articleEntityList);
-                saveArticleList(columnSlug, articleEntityList);
+                saveArticleList(articleEntityList);
             }
 
             @Override
@@ -50,7 +54,7 @@ public class ArticleListPagePresenter {
         });
     }
 
-    private void saveArticleList(final String columnSlug, final List<ArticleEntity> articleEntityList) {
+    private void saveArticleList(final List<ArticleEntity> articleEntityList) {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -66,7 +70,7 @@ public class ArticleListPagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                final List<ArticleEntity> articleEntityList = mArticleEntityDao.queryRaw("where COLUMN_SLUG = ?", columnSlug);
+                final List<ArticleEntity> articleEntityList = mArticleEntityDao.queryRaw("where " + ArticleEntityDao.Properties.ColumnSlug.columnName + " = ?", columnSlug);
                 Log.d("cxh", articleEntityList.toString());
                 mUiHandler.post(new Runnable() {
                     @Override

@@ -1,6 +1,7 @@
 package practice.cxh.zhihuzhuanlan.util;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -8,6 +9,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
 
 public class HttpUtil {
 
@@ -22,6 +29,27 @@ public class HttpUtil {
         this.mContext = context;
         this.mRequestQueue = Volley.newRequestQueue(mContext);
     }
+
+//    public static void get(String url, final HttpListener httpListener) {
+//        OkHttpClient okHttpClient = new OkHttpClient();
+//        final okhttp3.Request request = new okhttp3.Request.Builder()
+//                .url(url)
+//                .get()
+//                .build();
+//        Call call = okHttpClient.newCall(request);
+//        call.enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                httpListener.onFail();
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, okhttp3.Response response) throws IOException {
+//                Log.d("cxh", response.body().toString());
+//                httpListener.onSuccess(response.body().string());
+//            }
+//        });
+//    }
 
     public void get(String url, final HttpListener httpListener) {
         StringRequest request = new StringRequest(Request.Method.GET,
