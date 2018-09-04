@@ -22,6 +22,8 @@ public class ArticleListActivity extends AppCompatActivity {
 
     private ArticleListPagePresenter mPresenter;
 
+    private ArticleListFragment mArticleListFragment;
+
     private RecyclerView rvArticles;
 
     private ArticleEntityAdapter mAdapter;
@@ -37,26 +39,39 @@ public class ArticleListActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
-        initData();
     }
 
     private void initView() {
-        setContentView(R.layout.activity_article_list);
-        rvArticles = (RecyclerView) findViewById(R.id.rv_articles);
-        rvArticles.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
-        rvArticles.setAdapter(mAdapter);
+        setContentView(R.layout.activity_article_list_wrap);
+        mArticleListFragment = new ArticleListFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.container, mArticleListFragment).commit();
     }
 
-    private void initData() {
-        Intent intent = getIntent();
-        mColumnSlug = intent.getStringExtra(COLUMN_SLUG);
-        mPresenter = new ArticleListPagePresenter(this);
-        mPresenter.loadArticleList(mColumnSlug);
-    }
-
-    public void onArticleListLoaded(List<ArticleEntity> articleEntityList) {
-        mArticleEntityList.addAll(articleEntityList);
-        mAdapter.notifyDataSetChanged();
-    }
+    //    @Override
+//    protected void onCreate(@Nullable Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        initView();
+//        initData();
+//    }
+//
+//    private void initView() {
+//        setContentView(R.layout.activity_article_list_wrap);
+//        rvArticles = (RecyclerView) findViewById(R.id.rv_articles);
+//        rvArticles.setLayoutManager(new LinearLayoutManager(this));
+//        mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
+//        rvArticles.setAdapter(mAdapter);
+//    }
+//
+//    private void initData() {
+//        Intent intent = getIntent();
+//        mColumnSlug = intent.getStringExtra(COLUMN_SLUG);
+//        mPresenter = new ArticleListPagePresenter(this);
+//        mPresenter.loadArticleList(mColumnSlug);
+//    }
+//
+//    @Override
+//    public void onArticleListLoaded(List<ArticleEntity> articleEntityList) {
+//        mArticleEntityList.addAll(articleEntityList);
+//        mAdapter.notifyDataSetChanged();
+//    }
 }

@@ -10,6 +10,7 @@ import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.FileUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
@@ -17,21 +18,19 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 public class ArticleContentPagePresenter {
 
     private ArticleContentActivity mActivity;
-    private HttpUtil mHttpUtil;
     private FileUtil mFileUtil;
     private ArticleEntityDao mArticleEntityDao;
     private Handler mUiHandler;
 
     public ArticleContentPagePresenter(ArticleContentActivity activity) {
         this.mActivity = activity;
-        mHttpUtil = new HttpUtil(mActivity.getApplicationContext());
         mFileUtil = new FileUtil(mActivity);
-        mArticleEntityDao = ((ZhihuZhuanlanApplication) mActivity.getApplication()).getDaoSession().getArticleEntityDao();
+        mArticleEntityDao = DbUtil.getDaoSession().getArticleEntityDao();
         mUiHandler = new Handler(mActivity.getMainLooper());
     }
 
     public void loadArticleContent(final String articleSlug) {
-        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
+        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
             @Override
             public void onSuccess(String response) {
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);

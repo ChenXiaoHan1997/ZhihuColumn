@@ -11,25 +11,24 @@ import practice.cxh.zhihuzhuanlan.bean.Article;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class ArticleListPagePresenter {
 
-    private ArticleListActivity mActivity;
-    private HttpUtil mHttpUtil;
+    private ArticleListV mArticleListV;
     private ArticleEntityDao mArticleEntityDao;
     private Handler mUiHandler;
 
-    public ArticleListPagePresenter(ArticleListActivity activity) {
-        this.mActivity = activity;
-        mHttpUtil = new HttpUtil(mActivity.getApplicationContext());
-        mArticleEntityDao = ((ZhihuZhuanlanApplication) mActivity.getApplication()).getDaoSession().getArticleEntityDao();
-        mUiHandler = new Handler(mActivity.getMainLooper());
+    public ArticleListPagePresenter(ArticleListV articleListV) {
+        this.mArticleListV = articleListV;
+        mArticleEntityDao = DbUtil.getDaoSession().getArticleEntityDao();
+        mUiHandler = new Handler();
     }
 
     public void loadArticleList(final String columnSlug) {
-        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug + "/" + HttpUtil.POSTS, new HttpUtil.HttpListener() {
+        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug + "/" + HttpUtil.POSTS, new HttpUtil.HttpListener() {
             @Override
             public void onSuccess(String response) {
                 List<Article> articlesList = JsonUtil.decodeArticleList(response);
@@ -43,7 +42,7 @@ public class ArticleListPagePresenter {
                     }
                     articleEntityList.add(articleEntity);
                 }
-                mActivity.onArticleListLoaded(articleEntityList);
+                mArticleListV.onArticleListLoaded(articleEntityList);
                 saveArticleList(articleEntityList);
             }
 
@@ -75,7 +74,7 @@ public class ArticleListPagePresenter {
                 mUiHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mActivity.onArticleListLoaded(articleEntityList);
+                        mArticleListV.onArticleListLoaded(articleEntityList);
                     }
                 });
             }

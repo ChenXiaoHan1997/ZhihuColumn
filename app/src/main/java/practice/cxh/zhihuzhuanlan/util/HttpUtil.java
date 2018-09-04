@@ -1,5 +1,6 @@
 package practice.cxh.zhihuzhuanlan.util;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -25,16 +26,44 @@ public class HttpUtil {
     private Context mContext;
     private RequestQueue mRequestQueue;
 
+    private static Context sContext;
+    private static RequestQueue sRequestQueue;
+
+    public static void init(Application application) {
+        sContext = application;
+        sRequestQueue = Volley.newRequestQueue(sContext);
+    }
+
     public HttpUtil(Context context) {
         this.mContext = context;
         this.mRequestQueue = Volley.newRequestQueue(mContext);
     }
 
-//    public static void get(String url, final HttpListener httpListener) {
+    public static void get(String url, final HttpListener httpListener) {
+        StringRequest request = new StringRequest(Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        httpListener.onSuccess(s);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        httpListener.onFail();
+                    }
+                });
+        sRequestQueue.add(request);
+    }
+
+
+
+//    public static void get0(String url, final HttpListener httpListener) {
 //        OkHttpClient okHttpClient = new OkHttpClient();
 //        final okhttp3.Request request = new okhttp3.Request.Builder()
 //                .url(url)
-//                .get()
+//                .get0()
 //                .build();
 //        Call call = okHttpClient.newCall(request);
 //        call.enqueue(new Callback() {
@@ -51,7 +80,7 @@ public class HttpUtil {
 //        });
 //    }
 
-    public void get(String url, final HttpListener httpListener) {
+    public void get0(String url, final HttpListener httpListener) {
         StringRequest request = new StringRequest(Request.Method.GET,
                 url,
                 new Response.Listener<String>() {

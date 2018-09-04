@@ -10,12 +10,12 @@ import practice.cxh.zhihuzhuanlan.bean.Column;
 import practice.cxh.zhihuzhuanlan.db.ColumnEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class MainpagePresenter {
     private MainActivity mActivity;
-    private HttpUtil mHttpUtil;
     private ColumnEntityDao mColumnEntityDao;
     private Handler mUiHandler;
 
@@ -23,14 +23,13 @@ public class MainpagePresenter {
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
-        mHttpUtil = new HttpUtil(mActivity.getApplicationContext());
-        mColumnEntityDao = ((ZhihuZhuanlanApplication) mActivity.getApplication()).getDaoSession().getColumnEntityDao();
+        mColumnEntityDao = DbUtil.getDaoSession().getColumnEntityDao();
         mUiHandler = new Handler(mActivity.getMainLooper());
     }
 
     public void loadColums() {
         for (final String columnSlug : columnsSlugs) {
-            mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug, new HttpUtil.HttpListener() {
+            HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug, new HttpUtil.HttpListener() {
                 @Override
                 public void onSuccess(String response) {
                     Column column = JsonUtil.decodeColumn(response);
