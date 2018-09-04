@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.column_page;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -18,61 +19,96 @@ import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.article_page.ArticleContentActivity;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 
-public class ArticleEntityAdapter extends RecyclerView.Adapter<ArticleEntityAdapter.ViewHolder> {
+public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<ArticleEntity> mArticleEntities;
-    Context mContext;
+    public static final int LOADING = 0;
+    public static final int LOADING_COMPLETE = 1;
+    public static final int LOADING_END = 2;
+
+    private static final int TYPE_ITEM = 0;
+    private static final int TYPE_FOOTER = 1;
+
+    private int mLoadState;
+
+    private List<ArticleEntity> mArticleEntities;
+    private Context mContext;
 
     public ArticleEntityAdapter(Context context, List<ArticleEntity> articleEntities) {
         this.mContext = context;
         this.mArticleEntities = articleEntities;
+        this.mLoadState = LOADING_COMPLETE;
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View articleItemView = LayoutInflater.from(mContext).inflate(R.layout.item_article, parent, false);
-        return new ViewHolder(articleItemView);
-    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        final ArticleEntity articleEntity = mArticleEntities.get(position);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ArticleContentActivity.launch((Activity) mContext, articleEntity.getSlug());
-            }
-        });
-        if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
-            holder.ivPic.setVisibility(View.GONE);
+    public int getItemViewType(int position) {
+        if (position + 1 == getItemCount()) {
+            return TYPE_FOOTER;
         } else {
-            Glide.with(mContext).load(articleEntity.getTitleImage()).into(holder.ivPic);
+            return TYPE_ITEM;
         }
-        holder.tvTitle.setText(articleEntity.getTitle());
-        holder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
-        holder.tvDate.setText(articleEntity.getPublishedTime());
-        switch (articleEntity.getDownloadState()) {
-            case ArticleEntity.DOWNLOAD_SUCCEED:
-                holder.tvState.setText(mContext.getString(R.string.downloaded));
-                holder.tvState.setTextColor(mContext.getResources().getColor(R.color.limeGreen));
-                break;
-            case ArticleEntity.DOWNLOADING:
-                holder.tvState.setText(mContext.getString(R.string.downloading));
-                holder.tvState.setTextColor(mContext.getResources().getColor(R.color.shaddleBrown));
-                break;
-            default:
-                break;
-
-        }
-
     }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == TYPE_ITEM) {
+            View articleItemView = LayoutInflater.from(mContext).inflate(R.layout.item_article, parent, false);
+            return new ItemViewHolder(articleItemView);
+        } else if (viewType == TYPE_FOOTER) {
+            View footerView = LayoutInflater.from(mContext).inflate(R.layout.layout_refresh_footer, parent, false);
+            return new FooterViewHolder(footerView);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof ItemViewHolder) {
+            ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
+            final ArticleEntity articleEntity = mArticleEntities.get(position);
+            itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ArticleContentActivity.launch((Activity) mContext, articleEntity.getSlug());
+                }
+            });
+            if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
+                itemViewHolder.ivPic.setVisibility(View.GONE);
+            } else {
+                Glide.with(mContext).load(articleEntity.getTitleImage()).into(itemViewHolder.ivPic);
+            }
+            itemViewHolder.tvTitle.setText(articleEntity.getTitle());
+            itemViewHolder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
+            itemViewHolder.tvDate.setText(articleEntity.getPublishedTime());
+            switch (articleEntity.getDownloadState()) {
+                case ArticleEntity.DOWNLOAD_SUCCEED:
+                    itemViewHolder.tvState.setText(mContext.getString(R.string.downloaded));
+                    itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.limeGreen));
+                    break;
+                case ArticleEntity.DOWNLOADING:
+                    itemViewHolder.tvState.setText(mContext.getString(R.string.downloading));
+                    itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.shaddleBrown));
+                    break;
+                default:
+                    break;
+            }
+        } else if (holder instanceof FooterViewHolder) {
+            FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
+            footerViewHolder.tvRefresh.setText(mContext.getString(R.string.load_more));
+        }
+    }
+
+
+
 
     @Override
     public int getItemCount() {
-        return mArticleEntities.size();
+        return mArticleEntities.size() + 1;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ItemViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvTitle;
         TextView tvLikesCount;
@@ -80,13 +116,23 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<ArticleEntityAdap
         TextView tvState;
         ImageView ivPic;
 
-        public ViewHolder(View itemView) {
+        public ItemViewHolder(View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvLikesCount = itemView.findViewById(R.id.tv_likes_count);
             tvDate = itemView.findViewById(R.id.tv_date);
             tvState = itemView.findViewById(R.id.tv_state);
             ivPic = itemView.findViewById(R.id.iv_pic);
+        }
+    }
+
+    class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        TextView tvRefresh;
+
+        public FooterViewHolder(View itemView) {
+            super(itemView);
+            tvRefresh = itemView.findViewById(R.id.tv_load_more);
         }
     }
 }
