@@ -4,11 +4,13 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 
+import java.io.Serializable;
+
 import practice.cxh.zhihuzhuanlan.bean.Column;
 import practice.cxh.zhihuzhuanlan.util.StringUtil;
 
 @Entity
-public class ColumnEntity {
+public class ColumnEntity implements Serializable {
 
     @Id
     private String slug;

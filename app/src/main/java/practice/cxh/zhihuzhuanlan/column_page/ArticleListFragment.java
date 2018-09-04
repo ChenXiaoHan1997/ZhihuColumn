@@ -16,14 +16,14 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
+import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 
 public class ArticleListFragment extends Fragment implements ArticleListV {
 
-    private static String COLUMN_SLUG = "column_slug";
-
-    private String mColumnSlug;
+    private ColumnEntity mColumnEntity;
 
     private ArticleListPagePresenter mPresenter;
 
@@ -55,9 +55,9 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
 
     private void initData() {
         Intent intent = getActivity().getIntent();
-        mColumnSlug = intent.getStringExtra(COLUMN_SLUG);
+        mColumnEntity = (ColumnEntity) intent.getSerializableExtra(ArticleListActivity.COLUMN_ENTITY);
         mPresenter = new ArticleListPagePresenter(this);
-        mPresenter.loadArticleList(mColumnSlug);
+        mPresenter.loadArticleList(mColumnEntity.getSlug());
     }
 
     @Override
@@ -65,4 +65,11 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
         mArticleEntityList.addAll(articleEntityList);
         mAdapter.notifyDataSetChanged();
     }
+
+    private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
+        @Override
+        public void onLoadMore() {
+
+        }
+    };
 }

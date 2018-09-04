@@ -96,12 +96,27 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         } else if (holder instanceof FooterViewHolder) {
             FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
-            footerViewHolder.tvRefresh.setText(mContext.getString(R.string.load_more));
+            switch (mLoadState) {
+                case LOADING:
+                    footerViewHolder.tvLoading.setVisibility(View.VISIBLE);
+                    footerViewHolder.tvLoadEnd.setVisibility(View.GONE);
+                    break;
+                case LOADING_COMPLETE:
+                    footerViewHolder.tvLoading.setVisibility(View.INVISIBLE);
+                    footerViewHolder.tvLoadEnd.setVisibility(View.INVISIBLE);
+                    break;
+                case LOADING_END:
+                    footerViewHolder.tvLoading.setVisibility(View.GONE);
+                    footerViewHolder.tvLoadEnd.setVisibility(View.VISIBLE);
+                    break;
+            }
         }
     }
 
-
-
+    public void setLoadState(int loadState) {
+        this.mLoadState = loadState;
+        notifyDataSetChanged();
+    }
 
     @Override
     public int getItemCount() {
@@ -128,11 +143,13 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     class FooterViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvRefresh;
+        TextView tvLoading;
+        TextView tvLoadEnd;
 
         public FooterViewHolder(View itemView) {
             super(itemView);
-            tvRefresh = itemView.findViewById(R.id.tv_load_more);
+            tvLoading = itemView.findViewById(R.id.tv_loading);
+            tvLoadEnd = itemView.findViewById(R.id.tv_load_end);
         }
     }
 }

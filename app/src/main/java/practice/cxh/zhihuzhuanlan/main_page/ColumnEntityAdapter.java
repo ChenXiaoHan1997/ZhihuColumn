@@ -39,7 +39,8 @@ public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArticleListActivity.launch((Activity) mContext, columnEntity.getSlug());
+//                ArticleListActivity.launch((Activity) mContext, columnEntity.getSlug());
+                ArticleListActivity.lauch((Activity) mContext, columnEntity);
             }
         });
         holder.tvName.setText(columnEntity.getName());

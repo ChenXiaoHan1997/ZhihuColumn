@@ -6,4 +6,6 @@
     <string name="downloaded">已下载</string>
     <string name="downloading">正在下载</string>
     <string name="load_more">上滑加载更多</string>
+    <string name="loading">正在加载...</string>
+    <string name="no_more">没有更多啦</string>
 </resources>
