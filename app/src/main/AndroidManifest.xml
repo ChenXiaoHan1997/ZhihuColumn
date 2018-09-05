@@ -8,7 +8,7 @@
         android:name=".ZhihuZhuanlanApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="知乎专栏"
+        android:label="吱呼专栏"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
