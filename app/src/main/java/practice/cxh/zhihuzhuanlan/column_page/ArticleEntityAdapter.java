@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import java.util.List;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.article_page.ArticleContentActivity;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
+import practice.cxh.zhihuzhuanlan.util.TimeUtil;
 
 public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -68,20 +70,6 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (holder instanceof ItemViewHolder) {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             final ArticleEntity articleEntity = mArticleEntities.get(position);
-            itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ArticleContentActivity.launch((Activity) mContext, articleEntity.getSlug());
-                }
-            });
-            if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
-                itemViewHolder.ivPic.setVisibility(View.GONE);
-            } else {
-                Glide.with(mContext).load(articleEntity.getTitleImage()).into(itemViewHolder.ivPic);
-            }
-            itemViewHolder.tvTitle.setText(articleEntity.getTitle());
-            itemViewHolder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
-            itemViewHolder.tvDate.setText(articleEntity.getPublishedTime());
             switch (articleEntity.getDownloadState()) {
                 case ArticleEntity.DOWNLOAD_SUCCEED:
                     itemViewHolder.tvState.setText(mContext.getString(R.string.downloaded));
@@ -92,8 +80,24 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
                     itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.shaddleBrown));
                     break;
                 default:
+                    itemViewHolder.tvState.setText("");
                     break;
             }
+            if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
+                itemViewHolder.ivPic.setVisibility(View.GONE);
+            } else {
+                Glide.with(mContext).load(articleEntity.getTitleImage()).into(itemViewHolder.ivPic);
+            }
+            itemViewHolder.tvTitle.setText(articleEntity.getTitle());
+            itemViewHolder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
+            itemViewHolder.tvDate.setText(TimeUtil.convertPublishTime(articleEntity.getPublishedTime()));
+            itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ArticleContentActivity.launch((Activity) mContext, articleEntity.getSlug());
+                }
+            });
+
         } else if (holder instanceof FooterViewHolder) {
             FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
             switch (mLoadState) {
