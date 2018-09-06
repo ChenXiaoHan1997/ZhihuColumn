@@ -10,6 +10,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
     private CircleImageView ivAvatar;
     private TextView tvDescription;
     private RecyclerView rvArticles;
+    private Toolbar toolbar;
 
     private ArticleEntityAdapter mAdapter;
     private List<ArticleEntity> mArticleEntityList = new ArrayList<>();
@@ -81,6 +83,7 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
         rvArticles.setLayoutManager(new LinearLayoutManager(this.getContext()));
         mAdapter = new ArticleEntityAdapter(this.getContext(), mArticleEntityList);
         rvArticles.setAdapter(mAdapter);
+        toolbar = mLayoutRoot.findViewById(R.id.tb_article_list);
     }
 
     private void initData() {
