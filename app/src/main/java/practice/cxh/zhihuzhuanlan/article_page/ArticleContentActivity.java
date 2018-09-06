@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -34,11 +38,14 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     private ArticleContentPagePresenter mPresenter;
 
+    private AppBarLayout mAppBar;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ImageView ivTitleImage;
     private TextView tvTitle;
     private CircleImageView ivAvatar;
     private TextView tvAuthorAndTime;
     private WebView wvContent;
+    private Toolbar toolbar;
 
     public static void launch(Activity activity, ArticleEntity articleEntity) {
         Intent intent = new Intent(activity, ArticleContentActivity.class);
@@ -50,6 +57,8 @@ public class ArticleContentActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
+        initToolbar();
+        registerListenerAndReceiver();
         checkWifi();
         initData();
     }
@@ -60,11 +69,26 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     private void initView() {
         setContentView(R.layout.activity_article_content);
+        mAppBar = findViewById(R.id.app_bar);
+        mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         ivTitleImage = findViewById(R.id.iv_title_image);
         tvTitle = findViewById(R.id.tv_title);
         ivAvatar = findViewById(R.id.iv_avatar);
         tvAuthorAndTime = findViewById(R.id.tv_author_time);
         wvContent = findViewById(R.id.wv_content);
+    }
+
+    private void initToolbar() {
+        toolbar = findViewById(R.id.tb_article_content);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private void registerListenerAndReceiver() {
+        mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
     }
 
     private void initData() {
@@ -97,6 +121,17 @@ public class ArticleContentActivity extends AppCompatActivity {
                     "    }  " +
                     "}" +
                     "})()");
+        }
+    };
+
+    private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
+        @Override
+        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+            if (verticalOffset <= -(ivTitleImage.getHeight() - toolbar.getHeight())) {
+                mCollapsingToolbarLayout.setTitle(mArticleEntity.getTitle());
+            } else {
+                mCollapsingToolbarLayout.setTitle("");
+            }
         }
     };
 
