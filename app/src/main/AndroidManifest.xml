@@ -24,6 +24,9 @@
             android:name=".column_page.ArticleListActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".column_page.ArticleDownloadActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".article_page.ArticleContentActivity"
             android:screenOrientation="portrait" />
     </application>
