@@ -91,7 +91,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
-        Glide.with(this).load(mColumnEntity.getPicUrl()).into(ivAvatar);
+        Glide.with(this).load(mColumnEntity.getAvatar()).into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);
         mPresenter.loadArticleList(mColumnEntity.getSlug(), 0);

@@ -93,7 +93,7 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
             itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ArticleContentActivity.launch((Activity) mContext, articleEntity.getSlug());
+                    ArticleContentActivity.launch((Activity) mContext, articleEntity);
                 }
             });
 

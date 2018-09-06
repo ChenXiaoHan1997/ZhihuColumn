@@ -46,7 +46,7 @@ public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapte
         holder.tvDescription.setText(columnEntity.getDescription());
         holder.tvPostsCount.setText(String.format(mContext.getString(R.string.posts_count), columnEntity.getPostsCount()));
         holder.tvFollowersCount.setText(String.format(mContext.getString(R.string.followers_count), columnEntity.getFollowersCount()));
-        Glide.with(mContext).load(columnEntity.getPicUrl()).into(holder.ivPic);
+        Glide.with(mContext).load(columnEntity.getAvatar()).into(holder.ivPic);
     }
 
     @Override

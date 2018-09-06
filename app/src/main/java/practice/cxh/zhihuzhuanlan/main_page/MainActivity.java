@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private MainpagePresenter mPresenter;
 
     private RecyclerView rvColumns;
-    private Toolbar tbMain;
+    private Toolbar toolbar;
 
     private ColumnEntityAdapter mAdapter;
     private List<ColumnEntity> mColumnEntityList = new ArrayList<>();
@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         setContentView(R.layout.activity_main);
-        tbMain = (Toolbar) findViewById(R.id.tb_main);
-        setSupportActionBar(tbMain);
+        toolbar = (Toolbar) findViewById(R.id.tb_main);
+        setSupportActionBar(toolbar);
         rvColumns = (RecyclerView) findViewById(R.id.rv_columns);
         rvColumns.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new ColumnEntityAdapter(this, mColumnEntityList);

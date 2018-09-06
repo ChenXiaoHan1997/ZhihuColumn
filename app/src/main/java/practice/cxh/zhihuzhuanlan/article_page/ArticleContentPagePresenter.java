@@ -8,6 +8,7 @@ import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
+import practice.cxh.zhihuzhuanlan.entity.ArticleContentEntity;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
@@ -32,7 +33,8 @@ public class ArticleContentPagePresenter {
             @Override
             public void onSuccess(String response) {
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
-                mActivity.onArticleContentLoaded(articleContent.getContent());
+                ArticleContentEntity articleContentEntity = ArticleContentEntity.convertFromArticleContent(articleContent);
+                mActivity.onArticleContentLoaded(articleContentEntity);
                 saveArticleContent(articleSlug, articleContent);
             }
 
@@ -62,15 +64,15 @@ public class ArticleContentPagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                final String content = FileUtil.readText(FileUtil.HTMLS_DIR + File.separator + articleSlug);
-                if (!TextUtils.isEmpty(content)) {
-                    mUiHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mActivity.onArticleContentLoaded(content);
-                        }
-                    });
-                }
+//                final String content = FileUtil.readText(FileUtil.HTMLS_DIR + File.separator + articleSlug);
+//                if (!TextUtils.isEmpty(content)) {
+//                    mUiHandler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mActivity.onArticleContentLoaded(content);
+//                        }
+//                    });
+//                }
             }
         });
     }

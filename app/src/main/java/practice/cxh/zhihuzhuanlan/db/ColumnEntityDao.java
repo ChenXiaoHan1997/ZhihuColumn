@@ -26,7 +26,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
     public static class Properties {
         public final static Property Slug = new Property(0, String.class, "slug", true, "SLUG");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property PicUrl = new Property(2, String.class, "picUrl", false, "PIC_URL");
+        public final static Property Avatar = new Property(2, String.class, "avatar", false, "AVATAR");
         public final static Property Description = new Property(3, String.class, "description", false, "DESCRIPTION");
         public final static Property FollowersCount = new Property(4, int.class, "followersCount", false, "FOLLOWERS_COUNT");
         public final static Property PostsCount = new Property(5, int.class, "postsCount", false, "POSTS_COUNT");
@@ -47,7 +47,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
         db.execSQL("CREATE TABLE " + constraint + "\"COLUMN_ENTITY\" (" + //
                 "\"SLUG\" TEXT PRIMARY KEY NOT NULL ," + // 0: slug
                 "\"NAME\" TEXT," + // 1: name
-                "\"PIC_URL\" TEXT," + // 2: picUrl
+                "\"AVATAR\" TEXT," + // 2: avatar
                 "\"DESCRIPTION\" TEXT," + // 3: description
                 "\"FOLLOWERS_COUNT\" INTEGER NOT NULL ," + // 4: followersCount
                 "\"POSTS_COUNT\" INTEGER NOT NULL );"); // 5: postsCount
@@ -73,9 +73,9 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
             stmt.bindString(2, name);
         }
  
-        String picUrl = entity.getPicUrl();
-        if (picUrl != null) {
-            stmt.bindString(3, picUrl);
+        String avatar = entity.getAvatar();
+        if (avatar != null) {
+            stmt.bindString(3, avatar);
         }
  
         String description = entity.getDescription();
@@ -100,9 +100,9 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
             stmt.bindString(2, name);
         }
  
-        String picUrl = entity.getPicUrl();
-        if (picUrl != null) {
-            stmt.bindString(3, picUrl);
+        String avatar = entity.getAvatar();
+        if (avatar != null) {
+            stmt.bindString(3, avatar);
         }
  
         String description = entity.getDescription();
@@ -123,7 +123,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
         ColumnEntity entity = new ColumnEntity( //
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // slug
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // picUrl
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // avatar
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // description
             cursor.getInt(offset + 4), // followersCount
             cursor.getInt(offset + 5) // postsCount
@@ -135,7 +135,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
     public void readEntity(Cursor cursor, ColumnEntity entity, int offset) {
         entity.setSlug(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setPicUrl(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setAvatar(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setDescription(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setFollowersCount(cursor.getInt(offset + 4));
         entity.setPostsCount(cursor.getInt(offset + 5));

@@ -58,16 +58,6 @@ public class ArticleEntity implements Serializable {
         return articleEntity;
     }
 
-    public static Article convertToArticle(ArticleEntity articleEntity) {
-        Article article = new Article();
-        article.setSlug(articleEntity.slug);
-        article.setTitle(articleEntity.title);
-        article.setTitleImage(articleEntity.titleImage);
-        article.setSummary(articleEntity.summary);
-        return article;
-    }
-
-
     public String getSlug() {
         return slug;
     }

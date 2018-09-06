@@ -9,26 +9,40 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.R;
+import practice.cxh.zhihuzhuanlan.bean.Article;
+import practice.cxh.zhihuzhuanlan.entity.ArticleContentEntity;
+import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.util.HtmlUtil;
+import practice.cxh.zhihuzhuanlan.util.StringUtil;
+import practice.cxh.zhihuzhuanlan.util.TimeUtil;
 
 public class ArticleContentActivity extends AppCompatActivity {
 
-    private static final String ARTICLE_SLUG = "article_slug";
+    private static final String ARTICLE_ENTITY = "article_entity";
     private static final String JS_INTERFACE = "js_interface";
 
-    private String mArticleSlug;
+    private ArticleEntity mArticleEntity;
 
     private boolean mIsWifi;
 
     private ArticleContentPagePresenter mPresenter;
 
+    private ImageView ivTitleImage;
+    private TextView tvTitle;
+    private CircleImageView ivAvatar;
+    private TextView tvAuthorAndTime;
     private WebView wvContent;
 
-    public static void launch(Activity activity, String slug) {
+    public static void launch(Activity activity, ArticleEntity articleEntity) {
         Intent intent = new Intent(activity, ArticleContentActivity.class);
-        intent.putExtra(ARTICLE_SLUG, slug);
+        intent.putExtra(ARTICLE_ENTITY, articleEntity);
         activity.startActivity(intent);
     }
 
@@ -46,21 +60,28 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     private void initView() {
         setContentView(R.layout.activity_article_content);
-        wvContent = (WebView) findViewById(R.id.wv_content);
+        ivTitleImage = findViewById(R.id.iv_title_image);
+        tvTitle = findViewById(R.id.tv_title);
+        ivAvatar = findViewById(R.id.iv_avatar);
+        tvAuthorAndTime = findViewById(R.id.tv_author_time);
+        wvContent = findViewById(R.id.wv_content);
     }
 
     private void initData() {
-        Intent intent = getIntent();
-        mArticleSlug = intent.getStringExtra(ARTICLE_SLUG);
+        mArticleEntity = (ArticleEntity) getIntent().getSerializableExtra(ARTICLE_ENTITY);
+        Glide.with(this).load(mArticleEntity.getTitleImage()).into(ivTitleImage);
+        tvTitle.setText(mArticleEntity.getTitle());
         mPresenter = new ArticleContentPagePresenter(this);
-        mPresenter.loadArticleContent(mArticleSlug);
+        mPresenter.loadArticleContent(mArticleEntity.getSlug());
     }
 
-    public void onArticleContentLoaded(String content) {
+    public void onArticleContentLoaded(ArticleContentEntity articleContentEntity) {
 //        wvContent.getSettings().setJavaScriptEnabled(true);
+        Glide.with(this).load(articleContentEntity.getAvatar()).into(ivAvatar);
+        tvAuthorAndTime.setText(String.format(getString(R.string.author_and_time), articleContentEntity.getAuthor(), TimeUtil.convertPublishTime(mArticleEntity.getPublishedTime())));
         wvContent.setWebViewClient(mWebViewClient);
         wvContent.addJavascriptInterface(this, JS_INTERFACE);
-        wvContent.loadData(HtmlUtil.getHtmlData(content, mIsWifi), "text/html; charset=UTF-8", null);
+        wvContent.loadData(HtmlUtil.getHtmlData(articleContentEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
