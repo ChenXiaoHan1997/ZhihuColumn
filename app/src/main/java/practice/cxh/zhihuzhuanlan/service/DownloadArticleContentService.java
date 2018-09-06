@@ -44,6 +44,9 @@ public class DownloadArticleContentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+        if (intent == null) {
+            return;
+        }
         final String articleSlug = intent.getStringExtra(ARTICLE_SLUG);
         Log.d("cxh", "try download " + articleSlug);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {

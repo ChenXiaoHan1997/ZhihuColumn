@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -69,7 +68,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     }
 
     private void initView() {
-        setContentView(R.layout.activity_article_list_wrap);
+        setContentView(R.layout.activity_article_list);
         mAppBar = findViewById(R.id.app_bar);
         mHeader = findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);

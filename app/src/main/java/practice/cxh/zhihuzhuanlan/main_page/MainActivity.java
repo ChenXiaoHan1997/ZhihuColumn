@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        setContentView(R.layout.activity_main_wrap);
+        setContentView(R.layout.activity_main);
         tbMain = (Toolbar) findViewById(R.id.tb_main);
         setSupportActionBar(tbMain);
         rvColumns = (RecyclerView) findViewById(R.id.rv_columns);
