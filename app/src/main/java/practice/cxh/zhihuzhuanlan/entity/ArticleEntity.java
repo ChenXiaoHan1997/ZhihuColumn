@@ -4,10 +4,12 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 
+import java.io.Serializable;
+
 import practice.cxh.zhihuzhuanlan.bean.Article;
 
 @Entity
-public class ArticleEntity {
+public class ArticleEntity implements Serializable {
 
     public static final int NO_CACHE = 0;
     public static final int DOWNLOADING = 1;

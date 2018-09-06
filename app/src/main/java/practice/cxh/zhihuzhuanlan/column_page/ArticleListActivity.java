@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -37,7 +36,6 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     private ArticleListPagePresenter mPresenter;
 
-    private View mLayoutRoot;
     private AppBarLayout mAppBar;
     private LinearLayout mHeader;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -50,7 +48,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private ArticleEntityAdapter mAdapter;
     private List<ArticleEntity> mArticleEntityList = new ArrayList<>();
 
-    public static void lauch(Activity activity, ColumnEntity columnEntity) {
+    public static void launch(Activity activity, ColumnEntity columnEntity) {
         Intent intent = new Intent(activity, ArticleListActivity.class);
         intent.putExtra(COLUMN_ENTITY, columnEntity);
         activity.startActivity(intent);
@@ -117,8 +115,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.download:
-                Intent intent = new Intent(this, ArticleDownloadActivity.class);
-                startActivity(intent);
+                ArticleDownloadActivity.launch(this, mArticleEntityList);
                 break;
             default:
                 break;
