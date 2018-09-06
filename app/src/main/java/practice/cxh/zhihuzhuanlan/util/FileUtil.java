@@ -1,5 +1,6 @@
 package practice.cxh.zhihuzhuanlan.util;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -18,26 +19,27 @@ import java.io.OutputStreamWriter;
 
 public class FileUtil {
 
-    public static String HTML_PREF = "html";
+    public static String HTMLS_DIR = "htmls";
 
-    static {
-        File file = new File(HTML_PREF);
-        if (!file.exists()) {
-            file.mkdirs();
+    private static Context sContext;
+    private static File sFilesDir;
+    private static File sHtmlsDir;
+
+    public static void init(Application application) {
+        sContext = application;
+        sFilesDir = sContext.getFilesDir();
+        sHtmlsDir = new File(sFilesDir, HTMLS_DIR);
+        if (!sHtmlsDir.exists()) {
+            sHtmlsDir.mkdirs();
         }
     }
 
-    private Context mContext;
-
-    public FileUtil(Context context) {
-        this.mContext = context;
-
-    }
-    public boolean saveText(String path, String txt) {
+    public static boolean saveText(String relativePath, String txt) {
+        String absolutePath = sFilesDir.getAbsolutePath() + File.separator + relativePath;
         FileOutputStream outputStream = null;
         BufferedWriter writer = null;
         try {
-            outputStream = mContext.openFileOutput(path, Context.MODE_PRIVATE);
+            outputStream = new FileOutputStream(absolutePath);
             writer = new BufferedWriter(new OutputStreamWriter(outputStream));
             writer.write(txt);
             return true;
@@ -54,12 +56,13 @@ public class FileUtil {
         }
     }
 
-    public String readText(String path) {
+    public static String readText(String relativePath) {
+        String absolutePath = sFilesDir.getAbsolutePath() + File.separator + relativePath;
         FileInputStream inputStream = null;
         BufferedReader reader = null;
         StringBuilder builder = new StringBuilder();
         try {
-            inputStream = mContext.openFileInput(path);
+            inputStream = new FileInputStream(absolutePath);
             reader = new BufferedReader(new InputStreamReader(inputStream));
             String line = "";
             while ((line = reader.readLine()) != null) {

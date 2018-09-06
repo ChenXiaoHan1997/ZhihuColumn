@@ -13,7 +13,7 @@ public class ArticleEntity implements Serializable {
 
     public static final int NO_CACHE = 0;
     public static final int DOWNLOADING = 1;
-    public static final int DOWNLOAD_SUCCEED = 2;
+    public static final int DOWNLOAD_SUCCESS = 2;
 
     @Id
     private String slug;

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +70,7 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             final ArticleEntity articleEntity = mArticleEntities.get(position);
             switch (articleEntity.getDownloadState()) {
-                case ArticleEntity.DOWNLOAD_SUCCEED:
+                case ArticleEntity.DOWNLOAD_SUCCESS:
                     itemViewHolder.tvState.setText(mContext.getString(R.string.downloaded));
                     itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.limeGreen));
                     break;

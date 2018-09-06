@@ -1,19 +1,23 @@
 package practice.cxh.zhihuzhuanlan.column_page;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,6 +31,7 @@ import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 
 public class ArticleListActivity extends AppCompatActivity implements ArticleListV {
 
@@ -59,6 +64,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         super.onCreate(savedInstanceState);
         initView();
         initToolbar();
+        registerListenerAndReceiver();
         initData();
     }
 
@@ -67,7 +73,6 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         mAppBar = findViewById(R.id.app_bar);
         mHeader = findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
-        mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
         tvName = findViewById(R.id.tv_name);
         ivAvatar = findViewById(R.id.iv_avatar);
         tvDescription = findViewById(R.id.tv_description);
@@ -77,6 +82,13 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         rvArticles.setAdapter(mAdapter);
     }
 
+    private void registerListenerAndReceiver() {
+        mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
+        rvArticles.addOnScrollListener(mEndlessRecyclerOnScrollListener);
+        IntentFilter intentFilter = new IntentFilter(DownloadArticleContentService.BC_DOWNLOAD_FINISH);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mDownloadFinishReicever, intentFilter);
+    }
+
     private void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
@@ -84,13 +96,18 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);
         mPresenter.loadArticleList(mColumnEntity.getSlug(), 0);
-        rvArticles.addOnScrollListener(mEndlessRecyclerOnScrollListener);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
+        super.onDestroy();
     }
 
     private void initToolbar() {
@@ -154,6 +171,13 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
             } else {
                 mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
             }
+        }
+    };
+
+    private BroadcastReceiver mDownloadFinishReicever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mAdapter.notifyDataSetChanged();
         }
     };
 }

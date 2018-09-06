@@ -22,17 +22,16 @@ public class ArticleListPagePresenter {
     private static final int ARTICLE_LIMIT = 10;
 
     private ArticleListV mArticleListV;
-    private ArticleEntityDao mArticleEntityDao;
+    private ArticleEntityDao mArticleListVcleEntityDao;
     private Handler mUiHandler;
 
     public ArticleListPagePresenter(ArticleListV articleListV) {
         this.mArticleListV = articleListV;
-        mArticleEntityDao = DbUtil.getDaoSession().getArticleEntityDao();
         mUiHandler = new Handler();
     }
 
     public void loadArticleList(final String columnSlug, final int offset) {
-//        loadArticleListFromDB(columnSlug, offset, ARTICLE_LIMIT, false);
+        // TODO 先从数据库加载
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug + "/" + HttpUtil.POSTS + "?offset=" + offset,
                 new HttpUtil.HttpListener() {
             @Override
@@ -42,9 +41,8 @@ public class ArticleListPagePresenter {
                 for (Article article : articlesList) {
                     ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article);
                     articleEntity.setColumnSlug(columnSlug);
-                    List<ArticleEntity> tmp = mArticleEntityDao.queryBuilder()
+                    List<ArticleEntity> tmp = DbUtil.getArticleEntityDao().queryBuilder()
                             .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
-                            .offset(offset)
                             .orderDesc(ArticleEntityDao.Properties.PublishedTime)
                             .list();
                     if (tmp.size() > 0) {
@@ -68,7 +66,7 @@ public class ArticleListPagePresenter {
             @Override
             public void run() {
                 for (ArticleEntity articleEntity : articleEntityList) {
-                    mArticleEntityDao.insertOrReplace(articleEntity);
+                    DbUtil.getArticleEntityDao().insertOrReplace(articleEntity);
                 }
             }
         });
@@ -82,7 +80,7 @@ public class ArticleListPagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                QueryBuilder queryBuilder = mArticleEntityDao.queryBuilder()
+                QueryBuilder queryBuilder = DbUtil.getArticleEntityDao().queryBuilder()
                         .where(ArticleEntityDao.Properties.ColumnSlug.eq(columnSlug))
                         .orderDesc(ArticleEntityDao.Properties.Slug);
                 if (limit > 0) {
