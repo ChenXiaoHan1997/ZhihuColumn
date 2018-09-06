@@ -3,6 +3,8 @@ package practice.cxh.zhihuzhuanlan.column_page;
 import android.os.Handler;
 import android.util.Log;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,8 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class ArticleListPagePresenter {
 
+    private static final int ARTICLE_LIMIT = 10;
+
     private ArticleListV mArticleListV;
     private ArticleEntityDao mArticleEntityDao;
     private Handler mUiHandler;
@@ -27,7 +31,8 @@ public class ArticleListPagePresenter {
         mUiHandler = new Handler();
     }
 
-    public void loadArticleList(final String columnSlug, int offset) {
+    public void loadArticleList(final String columnSlug, final int offset) {
+//        loadArticleListFromDB(columnSlug, offset, ARTICLE_LIMIT, false);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug + "/" + HttpUtil.POSTS + "?offset=" + offset,
                 new HttpUtil.HttpListener() {
             @Override
@@ -37,13 +42,13 @@ public class ArticleListPagePresenter {
                 for (Article article : articlesList) {
                     ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article);
                     articleEntity.setColumnSlug(columnSlug);
-                    List<ArticleEntity> tmp = mArticleEntityDao.queryRaw("where " + ArticleEntityDao.Properties.Slug.columnName + " = ?", articleEntity.getSlug());
+                    List<ArticleEntity> tmp = mArticleEntityDao.queryRaw(DbUtil.sqlSelectArticleById(articleEntity.getSlug()));
                     if (tmp.size() > 0) {
                         articleEntity.setDownloadState(tmp.get(0).getDownloadState());
                     }
                     articleEntityList.add(articleEntity);
                 }
-                mArticleListV.onArticleListLoaded(articleEntityList);
+                mArticleListV.onArticleListLoaded(articleEntityList, false);
                 saveArticleList(articleEntityList);
             }
 
@@ -63,19 +68,29 @@ public class ArticleListPagePresenter {
                 }
             }
         });
-
     }
 
     private void loadArticleListFromDB(final String columnSlug) {
+        loadArticleListFromDB(columnSlug, 0, -1, true);
+    }
+
+    private void loadArticleListFromDB(final String columnSlug, final int offset, final int limit, final boolean clearOld) {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                final List<ArticleEntity> articleEntityList = mArticleEntityDao.queryRaw("where " + ArticleEntityDao.Properties.ColumnSlug.columnName + " = ?", columnSlug);
+                QueryBuilder queryBuilder = mArticleEntityDao.queryBuilder()
+                        .where(ArticleEntityDao.Properties.ColumnSlug.eq(columnSlug))
+                        .orderDesc(ArticleEntityDao.Properties.Slug);
+                if (limit > 0) {
+                    queryBuilder.limit(limit)
+                            .offset(offset);
+                }
+                final List<ArticleEntity> articleEntityList = queryBuilder.list();
                 Log.d("cxh", articleEntityList.toString());
                 mUiHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mArticleListV.onArticleListLoaded(articleEntityList);
+                        mArticleListV.onArticleListLoaded(articleEntityList, clearOld);
                     }
                 });
             }

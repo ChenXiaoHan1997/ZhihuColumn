@@ -93,7 +93,7 @@ public class ArticleListFragment extends Fragment implements ArticleListV {
     }
 
     @Override
-    public void onArticleListLoaded(List<ArticleEntity> articleEntityList) {
+    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld) {
         mArticleEntityList.addAll(articleEntityList);
         mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
         mAdapter.notifyDataSetChanged();

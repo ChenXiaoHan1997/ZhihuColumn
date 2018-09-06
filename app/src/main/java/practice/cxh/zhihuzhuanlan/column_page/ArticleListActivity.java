@@ -58,6 +58,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
+        initToolbar();
         initData();
     }
 
@@ -74,7 +75,6 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
         rvArticles.setAdapter(mAdapter);
-        toolbar = findViewById(R.id.tb_article_list);
     }
 
     private void initData() {
@@ -93,16 +93,14 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        initToolbar();
-    }
-
     private void initToolbar() {
         toolbar = findViewById(R.id.tb_article_list);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_arrow_back_ios_white);
+        }
     }
 
     @Override
@@ -114,6 +112,9 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
             case R.id.download:
                 ArticleDownloadActivity.launch(this, mArticleEntityList);
                 break;
@@ -124,7 +125,10 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     }
 
     @Override
-    public void onArticleListLoaded(List<ArticleEntity> articleEntityList) {
+    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld) {
+        if (clearOld) {
+            mArticleEntityList.clear();
+        }
         mArticleEntityList.addAll(articleEntityList);
         mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
         mAdapter.notifyDataSetChanged();
