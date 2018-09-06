@@ -42,7 +42,11 @@ public class ArticleListPagePresenter {
                 for (Article article : articlesList) {
                     ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article);
                     articleEntity.setColumnSlug(columnSlug);
-                    List<ArticleEntity> tmp = mArticleEntityDao.queryRaw(DbUtil.sqlSelectArticleById(articleEntity.getSlug()));
+                    List<ArticleEntity> tmp = mArticleEntityDao.queryBuilder()
+                            .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
+                            .offset(offset)
+                            .orderDesc(ArticleEntityDao.Properties.PublishedTime)
+                            .list();
                     if (tmp.size() > 0) {
                         articleEntity.setDownloadState(tmp.get(0).getDownloadState());
                     }
