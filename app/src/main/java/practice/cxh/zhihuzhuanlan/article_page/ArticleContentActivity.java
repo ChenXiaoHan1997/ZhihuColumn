@@ -113,13 +113,13 @@ public class ArticleContentActivity extends AppCompatActivity {
         mPresenter.loadArticleContent(mArticleEntity.getSlug());
     }
 
-    public void onArticleContentLoaded(ArticleContentEntity articleContentEntity) {
+    public void onArticleContentLoaded(ArticleEntity articleEntity) {
 //        wvContent.getSettings().setJavaScriptEnabled(true);
-        Glide.with(this).load(articleContentEntity.getAvatar()).into(ivAvatar);
-        tvAuthorAndTime.setText(String.format(getString(R.string.author_and_time), articleContentEntity.getAuthor(), TimeUtil.convertPublishTime(mArticleEntity.getPublishedTime())));
+        Glide.with(this).load(articleEntity.getAvatar()).into(ivAvatar);
+        tvAuthorAndTime.setText(String.format(getString(R.string.author_and_time), articleEntity.getAuthor(), TimeUtil.convertPublishTime(mArticleEntity.getPublishedTime())));
         wvContent.setWebViewClient(mWebViewClient);
         wvContent.addJavascriptInterface(this, JS_INTERFACE);
-        wvContent.loadData(HtmlUtil.getHtmlData(articleContentEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
+        wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {

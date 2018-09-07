@@ -39,11 +39,10 @@ public class ArticleListPagePresenter {
                 List<Article> articlesList = JsonUtil.decodeArticleList(response);
                 List<ArticleEntity> articleEntityList = new ArrayList<ArticleEntity>();
                 for (Article article : articlesList) {
-                    ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article);
-                    articleEntity.setColumnSlug(columnSlug);
-                    List<ArticleEntity> tmp = DbUtil.getArticleEntityDao().queryBuilder()
+                    ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article, columnSlug);
+                    List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
+                            .queryBuilder()
                             .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
-                            .orderDesc(ArticleEntityDao.Properties.PublishedTime)
                             .list();
                     if (tmp.size() > 0) {
                         articleEntity.setDownloadState(tmp.get(0).getDownloadState());
@@ -80,7 +79,8 @@ public class ArticleListPagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                QueryBuilder queryBuilder = DbUtil.getArticleEntityDao().queryBuilder()
+                QueryBuilder queryBuilder = DbUtil.getArticleEntityDao()
+                        .queryBuilder()
                         .where(ArticleEntityDao.Properties.ColumnSlug.eq(columnSlug))
                         .orderDesc(ArticleEntityDao.Properties.Slug);
                 if (limit > 0) {

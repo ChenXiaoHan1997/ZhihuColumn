@@ -27,15 +27,15 @@ public class ArticleContentEntity {
     public ArticleContentEntity() {
     }
 
-    public static ArticleContentEntity convertFromArticleContent(ArticleContent articleContent) {
-        ArticleContentEntity ariticleContentEntity = new ArticleContentEntity();
-        ariticleContentEntity.slug = articleContent.getSlug();
-        ariticleContentEntity.author = articleContent.getAuthor() == null?
-                "": articleContent.getAuthor().getName();
-        ariticleContentEntity.avatar = StringUtil.getAvatarUrl(articleContent.getAuthor(), "m");
-        ariticleContentEntity.content = articleContent.getContent();
-        return ariticleContentEntity;
-    }
+//    public static ArticleContentEntity convertFromArticleContent(ArticleContent articleContent) {
+//        ArticleContentEntity ariticleContentEntity = new ArticleContentEntity();
+//        ariticleContentEntity.slug = articleContent.getSlug();
+//        ariticleContentEntity.author = articleContent.getAuthor() == null?
+//                "": articleContent.getAuthor().getName();
+//        ariticleContentEntity.avatar = StringUtil.getAvatarUrl(articleContent.getAuthor(), "m");
+//        ariticleContentEntity.content = articleContent.getContent();
+//        return ariticleContentEntity;
+//    }
 
     public String getSlug() {
         return slug;

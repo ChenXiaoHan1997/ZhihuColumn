@@ -29,9 +29,11 @@ public class ArticleEntityDao extends AbstractDao<ArticleEntity, String> {
         public final static Property Title = new Property(2, String.class, "title", false, "TITLE");
         public final static Property PublishedTime = new Property(3, String.class, "publishedTime", false, "PUBLISHED_TIME");
         public final static Property TitleImage = new Property(4, String.class, "titleImage", false, "TITLE_IMAGE");
-        public final static Property Summary = new Property(5, String.class, "summary", false, "SUMMARY");
-        public final static Property LikesCount = new Property(6, int.class, "likesCount", false, "LIKES_COUNT");
-        public final static Property DownloadState = new Property(7, int.class, "downloadState", false, "DOWNLOAD_STATE");
+        public final static Property Author = new Property(5, String.class, "author", false, "AUTHOR");
+        public final static Property Avatar = new Property(6, String.class, "avatar", false, "AVATAR");
+        public final static Property Summary = new Property(7, String.class, "summary", false, "SUMMARY");
+        public final static Property LikesCount = new Property(8, int.class, "likesCount", false, "LIKES_COUNT");
+        public final static Property DownloadState = new Property(9, int.class, "downloadState", false, "DOWNLOAD_STATE");
     }
 
 
@@ -52,9 +54,11 @@ public class ArticleEntityDao extends AbstractDao<ArticleEntity, String> {
                 "\"TITLE\" TEXT," + // 2: title
                 "\"PUBLISHED_TIME\" TEXT," + // 3: publishedTime
                 "\"TITLE_IMAGE\" TEXT," + // 4: titleImage
-                "\"SUMMARY\" TEXT," + // 5: summary
-                "\"LIKES_COUNT\" INTEGER NOT NULL ," + // 6: likesCount
-                "\"DOWNLOAD_STATE\" INTEGER NOT NULL );"); // 7: downloadState
+                "\"AUTHOR\" TEXT," + // 5: author
+                "\"AVATAR\" TEXT," + // 6: avatar
+                "\"SUMMARY\" TEXT," + // 7: summary
+                "\"LIKES_COUNT\" INTEGER NOT NULL ," + // 8: likesCount
+                "\"DOWNLOAD_STATE\" INTEGER NOT NULL );"); // 9: downloadState
     }
 
     /** Drops the underlying database table. */
@@ -92,12 +96,22 @@ public class ArticleEntityDao extends AbstractDao<ArticleEntity, String> {
             stmt.bindString(5, titleImage);
         }
  
+        String author = entity.getAuthor();
+        if (author != null) {
+            stmt.bindString(6, author);
+        }
+ 
+        String avatar = entity.getAvatar();
+        if (avatar != null) {
+            stmt.bindString(7, avatar);
+        }
+ 
         String summary = entity.getSummary();
         if (summary != null) {
-            stmt.bindString(6, summary);
+            stmt.bindString(8, summary);
         }
-        stmt.bindLong(7, entity.getLikesCount());
-        stmt.bindLong(8, entity.getDownloadState());
+        stmt.bindLong(9, entity.getLikesCount());
+        stmt.bindLong(10, entity.getDownloadState());
     }
 
     @Override
@@ -129,12 +143,22 @@ public class ArticleEntityDao extends AbstractDao<ArticleEntity, String> {
             stmt.bindString(5, titleImage);
         }
  
+        String author = entity.getAuthor();
+        if (author != null) {
+            stmt.bindString(6, author);
+        }
+ 
+        String avatar = entity.getAvatar();
+        if (avatar != null) {
+            stmt.bindString(7, avatar);
+        }
+ 
         String summary = entity.getSummary();
         if (summary != null) {
-            stmt.bindString(6, summary);
+            stmt.bindString(8, summary);
         }
-        stmt.bindLong(7, entity.getLikesCount());
-        stmt.bindLong(8, entity.getDownloadState());
+        stmt.bindLong(9, entity.getLikesCount());
+        stmt.bindLong(10, entity.getDownloadState());
     }
 
     @Override
@@ -150,9 +174,11 @@ public class ArticleEntityDao extends AbstractDao<ArticleEntity, String> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // title
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // publishedTime
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // titleImage
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // summary
-            cursor.getInt(offset + 6), // likesCount
-            cursor.getInt(offset + 7) // downloadState
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // author
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // avatar
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // summary
+            cursor.getInt(offset + 8), // likesCount
+            cursor.getInt(offset + 9) // downloadState
         );
         return entity;
     }
@@ -164,9 +190,11 @@ public class ArticleEntityDao extends AbstractDao<ArticleEntity, String> {
         entity.setTitle(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setPublishedTime(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setTitleImage(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setSummary(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setLikesCount(cursor.getInt(offset + 6));
-        entity.setDownloadState(cursor.getInt(offset + 7));
+        entity.setAuthor(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setAvatar(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setSummary(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setLikesCount(cursor.getInt(offset + 8));
+        entity.setDownloadState(cursor.getInt(offset + 9));
      }
     
     @Override

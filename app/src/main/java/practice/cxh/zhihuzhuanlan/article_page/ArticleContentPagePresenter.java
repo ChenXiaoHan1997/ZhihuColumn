@@ -1,9 +1,12 @@
 package practice.cxh.zhihuzhuanlan.article_page;
 
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.File;
 import java.util.List;
+
+import javax.crypto.AEADBadTagException;
 
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
 import practice.cxh.zhihuzhuanlan.db.ArticleContentEntityDao;
@@ -30,9 +33,10 @@ public class ArticleContentPagePresenter {
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
             @Override
             public void onSuccess(String response) {
+                Log.d("cxh", "------------success-----------");
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
-                ArticleContentEntity articleContentEntity = ArticleContentEntity.convertFromArticleContent(articleContent);
-                mActivity.onArticleContentLoaded(articleContentEntity);
+                ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
+                mActivity.onArticleContentLoaded(articleEntity);
                 saveArticleContent(articleContent);
             }
 
@@ -48,14 +52,9 @@ public class ArticleContentPagePresenter {
             @Override
             public void run() {
                 FileUtil.saveText(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
-                List<ArticleEntity> tmp = DbUtil.getArticleEntityDao().queryBuilder()
-                        .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
-                        .list();
-                if (tmp.size() > 0) {
-                    ArticleEntity articleEntity = tmp.get(0);
-                    articleEntity.setDownloadState(ArticleEntity.DOWNLOAD_SUCCESS);
-                    DbUtil.getArticleEntityDao().update(articleEntity);
-                }
+                ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
+                articleEntity.setDownloadState(ArticleEntity.DOWNLOAD_SUCCESS);
+                DbUtil.getArticleEntityDao().update(articleEntity);
             }
         });
     }
@@ -64,18 +63,18 @@ public class ArticleContentPagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                List<ArticleContentEntity> articleContentEntityList = DbUtil.getArticleContentEntityDao()
+                List<ArticleEntity> articleEntityList = DbUtil.getArticleEntityDao()
                         .queryBuilder()
-                        .where(ArticleContentEntityDao.Properties.Slug.eq(articleSlug))
+                        .where(ArticleEntityDao.Properties.Slug.eq(articleSlug))
                         .list();
-                if (articleContentEntityList.size() > 0) {
-                    final ArticleContentEntity articleContentEntity = articleContentEntityList.get(0);
+                if (articleEntityList.size() > 0) {
+                    final ArticleEntity articleEntity = articleEntityList.get(0);
                     String content = FileUtil.readText(FileUtil.HTMLS_DIR + File.separator + articleSlug);
-                    articleContentEntity.setContent(content);
+                    articleEntity.setContent(content);
                     mUiHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mActivity.onArticleContentLoaded(articleContentEntity);
+                            mActivity.onArticleContentLoaded(articleEntity);
                         }
                     });
                 }

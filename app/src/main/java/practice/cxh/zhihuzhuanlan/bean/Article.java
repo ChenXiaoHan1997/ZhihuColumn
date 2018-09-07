@@ -2,21 +2,12 @@ package practice.cxh.zhihuzhuanlan.bean;
 
 public class Article {
 
-    private String title;
     private String publishedTime;
-    private String slug;
-    private String url;
+    private String title;
     private String titleImage;
     private String summary;
+    private String slug;
     private int likesCount;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getPublishedTime() {
         return publishedTime;
@@ -26,20 +17,12 @@ public class Article {
         this.publishedTime = publishedTime;
     }
 
-    public String getSlug() {
-        return slug;
+    public String getTitle() {
+        return title;
     }
 
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getTitleImage() {
@@ -56,6 +39,14 @@ public class Article {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     public int getLikesCount() {
