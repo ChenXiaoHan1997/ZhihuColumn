@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +32,7 @@ import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
+import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 
 public class ArticleListActivity extends AppCompatActivity implements ArticleListV {
 
@@ -46,6 +48,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private TextView tvName;
     private CircleImageView ivAvatar;
     private TextView tvDescription;
+    private SwipeRefreshLayout swipeRefresh;
     private RecyclerView rvArticles;
     private Toolbar toolbar;
 
@@ -75,6 +78,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         tvName = findViewById(R.id.tv_name);
         ivAvatar = findViewById(R.id.iv_avatar);
         tvDescription = findViewById(R.id.tv_description);
+        swipeRefresh = findViewById(R.id.swipe_refresh);
         rvArticles = findViewById(R.id.rv_articles);
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
@@ -86,6 +90,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
         // 文章列表在滑动到最后一项时开始加载
         rvArticles.addOnScrollListener(mEndlessRecyclerOnScrollListener);
+        swipeRefresh.setOnRefreshListener(mRefreshListener);
         // 注册监听后台下载广播
         IntentFilter intentFilter = new IntentFilter(DownloadArticleContentService.BC_DOWNLOAD_FINISH);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDownloadFinishReicever, intentFilter);
@@ -148,9 +153,30 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         if (clearOld) {
             mArticleEntityList.clear();
         }
+        int oldSize = mArticleEntityList.size();
         mArticleEntityList.addAll(articleEntityList);
         mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
-        mAdapter.notifyDataSetChanged();
+        mAdapter.notifyItemRangeChanged(oldSize, mArticleEntityList.size() - oldSize);
+    }
+
+    private void refreshArticleList() {
+        // TODO 重新加载
+        AsyncUtil.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefresh.setRefreshing(false);
+                    }
+                });
+            }
+        });
     }
 
     private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
@@ -173,6 +199,13 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
             } else {
                 mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
             }
+        }
+    };
+
+    private SwipeRefreshLayout.OnRefreshListener mRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            refreshArticleList();
         }
     };
 
