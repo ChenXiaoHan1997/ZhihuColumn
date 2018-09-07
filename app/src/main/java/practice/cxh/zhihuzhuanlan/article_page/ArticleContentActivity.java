@@ -21,11 +21,8 @@ import com.bumptech.glide.Glide;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.R;
-import practice.cxh.zhihuzhuanlan.bean.Article;
-import practice.cxh.zhihuzhuanlan.entity.ArticleContentEntity;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.util.HtmlUtil;
-import practice.cxh.zhihuzhuanlan.util.StringUtil;
 import practice.cxh.zhihuzhuanlan.util.TimeUtil;
 
 public class ArticleContentActivity extends AppCompatActivity {

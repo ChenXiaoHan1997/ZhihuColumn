@@ -82,8 +82,11 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     }
 
     private void registerListenerAndReceiver() {
+        // 折叠式标题栏在折叠时显示标题
         mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
+        // 文章列表在滑动到最后一项时开始加载
         rvArticles.addOnScrollListener(mEndlessRecyclerOnScrollListener);
+        // 注册监听后台下载广播
         IntentFilter intentFilter = new IntentFilter(DownloadArticleContentService.BC_DOWNLOAD_FINISH);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDownloadFinishReicever, intentFilter);
     }

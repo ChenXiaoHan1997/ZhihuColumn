@@ -5,7 +5,6 @@ import android.util.Log;
 
 import java.util.List;
 
-import practice.cxh.zhihuzhuanlan.ZhihuZhuanlanApplication;
 import practice.cxh.zhihuzhuanlan.bean.Column;
 import practice.cxh.zhihuzhuanlan.db.ColumnEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
@@ -16,17 +15,18 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class MainpagePresenter {
     private MainActivity mActivity;
-    private ColumnEntityDao mColumnEntityDao;
     private Handler mUiHandler;
 
     private String[] columnsSlugs = new String[] {"zhaohaoyang", "542b2333", "qiechihe", "c_134408063", "h4cj250", "huizi", "kaede", "zhangjiawei"};
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
-        mColumnEntityDao = DbUtil.getDaoSession().getColumnEntityDao();
         mUiHandler = new Handler(mActivity.getMainLooper());
     }
 
+    /**
+     * 加载所有关注的专栏
+     */
     public void loadColums() {
         for (final String columnSlug : columnsSlugs) {
             HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug, new HttpUtil.HttpListener() {
@@ -34,12 +34,15 @@ public class MainpagePresenter {
                 public void onSuccess(String response) {
                     Column column = JsonUtil.decodeColumn(response);
                     ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
+                    // 显示在UI
                     mActivity.onColumnLoaded(columnEntity);
+                    // 保存到数据库
                     saveColumnEntity(columnEntity);
                 }
 
                 @Override
                 public void onFail() {
+                    // 加载失败，读取本地数据
                     loadColumnEntityFromDB(columnSlug);
                 }
             });
@@ -50,7 +53,7 @@ public class MainpagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                mColumnEntityDao.insertOrReplace(columnEntity);
+                DbUtil.getColumnEntityDao().insertOrReplace(columnEntity);
             }
         });
     }
@@ -59,8 +62,10 @@ public class MainpagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                List<ColumnEntity> columnEntityList = mColumnEntityDao.queryRaw("where SLUG = ?", columnSlug);
-                Log.d("cxh", columnEntityList.toString());
+                List<ColumnEntity> columnEntityList = DbUtil.getColumnEntityDao()
+                        .queryBuilder()
+                        .where(ColumnEntityDao.Properties.Slug.eq(columnSlug))
+                        .list();
                 if (columnEntityList.size() > 0) {
                     final ColumnEntity columnEntity = columnEntityList.get(0);
                     mUiHandler.post(new Runnable() {

@@ -11,6 +11,12 @@ import practice.cxh.zhihuzhuanlan.bean.Avatar;
 
 public class StringUtil {
 
+    /**
+     * 获取头像的url
+     * @param author
+     * @param size
+     * @return
+     */
     public static String getAvatarUrl(Author author, String size) {
         if (author == null
                 || author.getAvatar() == null
@@ -21,6 +27,12 @@ public class StringUtil {
         return getAvatarUrl(author.getAvatar(), size);
     }
 
+    /**
+     * 获取头像的url
+     * @param avatar
+     * @param size
+     * @return
+     */
     public static String getAvatarUrl(Avatar avatar, String size) {
         if (avatar == null
                 || TextUtils.isEmpty(avatar.getId())
@@ -30,6 +42,13 @@ public class StringUtil {
         return getAvatarUrl(avatar.getId(), size, avatar.getTemplate());
     }
 
+    /**
+     * 获取头像的url
+     * @param picId
+     * @param size
+     * @param template
+     * @return
+     */
     public static String getAvatarUrl(String picId, String size, String template) {
         if (TextUtils.isEmpty(picId) || TextUtils.isEmpty(template)) {
             return "";

@@ -57,47 +57,6 @@ public class HttpUtil {
         sRequestQueue.add(request);
     }
 
-
-
-//    public static void get0(String url, final HttpListener httpListener) {
-//        OkHttpClient okHttpClient = new OkHttpClient();
-//        final okhttp3.Request request = new okhttp3.Request.Builder()
-//                .url(url)
-//                .get0()
-//                .build();
-//        Call call = okHttpClient.newCall(request);
-//        call.enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                httpListener.onFail();
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, okhttp3.Response response) throws IOException {
-//                Log.d("cxh", response.body().toString());
-//                httpListener.onSuccess(response.body().string());
-//            }
-//        });
-//    }
-
-    public void get0(String url, final HttpListener httpListener) {
-        StringRequest request = new StringRequest(Request.Method.GET,
-                url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-                        httpListener.onSuccess(s);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        httpListener.onFail();
-                    }
-                });
-        mRequestQueue.add(request);
-    }
-
     public interface HttpListener {
         void onSuccess(String response);
         void onFail();

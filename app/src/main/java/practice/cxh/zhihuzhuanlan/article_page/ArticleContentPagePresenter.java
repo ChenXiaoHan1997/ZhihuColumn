@@ -1,17 +1,12 @@
 package practice.cxh.zhihuzhuanlan.article_page;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.io.File;
 import java.util.List;
 
-import javax.crypto.AEADBadTagException;
-
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
-import practice.cxh.zhihuzhuanlan.db.ArticleContentEntityDao;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
-import practice.cxh.zhihuzhuanlan.entity.ArticleContentEntity;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
@@ -30,6 +25,7 @@ public class ArticleContentPagePresenter {
     }
 
     public void loadArticleContent(final String articleSlug) {
+        // 首先加载本地的数据
         loadArticleContentLocal(articleSlug);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
             @Override
@@ -51,11 +47,14 @@ public class ArticleContentPagePresenter {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
+                // 将文章内容html保存到files/htmls/<slug>中
                 FileUtil.saveText(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
+                // 将文章的作者、头像等信息保存到数据库
                 List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
                         .queryBuilder()
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
                         .list();
+                // 此处先查询出同slug的对象，主要是为了使文章列表中的对象同步更新
                 ArticleEntity articleEntity = tmp.size() > 0?
                         tmp.get(0): new ArticleEntity();
                 articleEntity.copyFromArticleContent(articleContent);

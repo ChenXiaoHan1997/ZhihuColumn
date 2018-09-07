@@ -8,7 +8,6 @@ import org.greenrobot.greendao.query.QueryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import practice.cxh.zhihuzhuanlan.ZhihuZhuanlanApplication;
 import practice.cxh.zhihuzhuanlan.bean.Article;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
@@ -22,7 +21,6 @@ public class ArticleListPagePresenter {
     private static final int ARTICLE_LIMIT = 10;
 
     private ArticleListV mArticleListV;
-    private ArticleEntityDao mArticleListVcleEntityDao;
     private Handler mUiHandler;
 
     public ArticleListPagePresenter(ArticleListV articleListV) {
@@ -39,7 +37,9 @@ public class ArticleListPagePresenter {
                 List<Article> articlesList = JsonUtil.decodeArticleList(response);
                 List<ArticleEntity> articleEntityList = new ArrayList<ArticleEntity>();
                 for (Article article : articlesList) {
+                    // articleEntity是新获得的
                     ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article, columnSlug);
+                    // 若数据库中已有此文章，设置articleEntity的下载状态
                     List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
                             .queryBuilder()
                             .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
@@ -71,10 +71,21 @@ public class ArticleListPagePresenter {
         });
     }
 
+    /**
+     * 从数据库中加载所有的文章
+     * @param columnSlug
+     */
     private void loadArticleListFromDB(final String columnSlug) {
         loadArticleListFromDB(columnSlug, 0, -1, true);
     }
 
+    /**
+     * 从数据库中加载文章
+     * @param columnSlug 专栏slug
+     * @param offset 偏移
+     * @param limit 最多加载数量
+     * @param clearOld 清除UI上旧的列表
+     */
     private void loadArticleListFromDB(final String columnSlug, final int offset, final int limit, final boolean clearOld) {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
