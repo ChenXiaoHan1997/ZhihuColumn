@@ -1,6 +1,8 @@
 package practice.cxh.zhihuzhuanlan.article_page;
 
 import android.os.Handler;
+import android.text.TextUtils;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
@@ -16,6 +18,9 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class ArticleContentPagePresenter {
 
+    private boolean mLoadedFromLocal;
+    private boolean mLoadedFromNet;
+
     private ArticleContentActivity mActivity;
     private Handler mUiHandler;
 
@@ -30,6 +35,7 @@ public class ArticleContentPagePresenter {
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
             @Override
             public void onSuccess(String response) {
+                mLoadedFromNet = true;
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
                 ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
                 mActivity.onArticleContentLoaded(articleEntity);
@@ -38,8 +44,9 @@ public class ArticleContentPagePresenter {
 
             @Override
             public void onFail() {
-                mActivity.onArticleContentLoadFail();
-//                loadArticleContentLocal(articleSlug);
+                if (!mLoadedFromLocal && !mLoadedFromNet) {
+                    mActivity.onArticleContentLoadFail();
+                }
             }
         });
     }
@@ -75,6 +82,10 @@ public class ArticleContentPagePresenter {
                 if (articleEntityList.size() > 0) {
                     final ArticleEntity articleEntity = articleEntityList.get(0);
                     String content = FileUtil.readText(FileUtil.HTMLS_DIR + File.separator + articleSlug);
+                    if (TextUtils.isEmpty(content)) {
+                        return;
+                    }
+                    mLoadedFromLocal = true;
                     articleEntity.setContent(content);
                     mUiHandler.post(new Runnable() {
                         @Override
