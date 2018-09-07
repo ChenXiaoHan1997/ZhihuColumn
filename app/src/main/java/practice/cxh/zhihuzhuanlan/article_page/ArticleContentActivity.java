@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.R;
@@ -119,7 +120,10 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     public void onArticleContentLoaded(ArticleEntity articleEntity) {
 //        wvContent.getSettings().setJavaScriptEnabled(true);
-        Glide.with(this).load(articleEntity.getAvatar()).into(ivAvatar);
+        Glide.with(this)
+                .load(articleEntity.getAvatar())
+                .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
+                .into(ivAvatar);
         tvAuthorAndTime.setText(String.format(getString(R.string.author_and_time), articleEntity.getAuthor(), TimeUtil.convertPublishTime(mArticleEntity.getPublishedTime())));
         wvContent.setWebViewClient(mWebViewClient);
         wvContent.addJavascriptInterface(this, JS_INTERFACE);

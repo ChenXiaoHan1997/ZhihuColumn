@@ -86,9 +86,10 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
                 itemViewHolder.ivPic.setVisibility(View.GONE);
             } else {
+                itemViewHolder.ivPic.setVisibility(View.VISIBLE);
                 Glide.with(mContext)
                         .load(articleEntity.getTitleImage())
-                        .apply(new RequestOptions().placeholder(R.drawable.ic_launcher_foreground))
+                        .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                         .into(itemViewHolder.ivPic);
             }
             itemViewHolder.tvTitle.setText(articleEntity.getTitle());

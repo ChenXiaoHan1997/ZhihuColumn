@@ -103,7 +103,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         tvName.setText(mColumnEntity.getName());
         Glide.with(this)
                 .load(mColumnEntity.getAvatar())
-                .apply(new RequestOptions().placeholder(R.drawable.ic_launcher_foreground))
+                .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);

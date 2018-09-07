@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
@@ -46,7 +47,10 @@ public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapte
         holder.tvDescription.setText(columnEntity.getDescription());
         holder.tvPostsCount.setText(String.format(mContext.getString(R.string.posts_count), columnEntity.getPostsCount()));
         holder.tvFollowersCount.setText(String.format(mContext.getString(R.string.followers_count), columnEntity.getFollowersCount()));
-        Glide.with(mContext).load(columnEntity.getAvatar()).into(holder.ivPic);
+        Glide.with(mContext)
+                .load(columnEntity.getAvatar())
+                .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
+                .into(holder.ivPic);
     }
 
     @Override
