@@ -11,5 +11,6 @@
     <color name="black">#000000</color>
     <color name="lime">#00FF00</color>
     <color name="limeGreen">#32CD32</color>
+    <color name="doderBlue">#1E90FF</color>
     <color name="shaddleBrown">#8B4513</color>
 </resources>

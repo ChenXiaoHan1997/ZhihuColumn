@@ -15,7 +15,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:collapsedTitleTextAppearance="@style/AppTheme.Toolbar"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
             app:contentScrim="@color/colorPrimary"
             app:expandedTitleMarginEnd="48dp"
             app:expandedTitleMarginStart="48dp"
@@ -82,7 +82,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/colorPrimary"
                 app:layout_collapseMode="pin"
-                app:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar" />
+                app:theme="@style/AppTheme.Dark.Toolbar" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 

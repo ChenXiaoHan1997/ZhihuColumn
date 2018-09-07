@@ -4,6 +4,7 @@ import android.app.Application;
 
 import org.greenrobot.greendao.database.Database;
 
+import practice.cxh.zhihuzhuanlan.db.ArticleContentEntityDao;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.db.ColumnEntityDao;
 import practice.cxh.zhihuzhuanlan.db.DaoMaster;
@@ -16,6 +17,7 @@ public class DbUtil {
     private static DaoSession sDaoSession;
     private static ColumnEntityDao sColumnEntityDao;
     private static ArticleEntityDao sArticleEntityDao;
+    private static ArticleContentEntityDao sArticleContentEntityDao;
 
     public static void init(Application application) {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(application, DB_NAME);
@@ -23,6 +25,7 @@ public class DbUtil {
         sDaoSession = new DaoMaster(db).newSession();
         sColumnEntityDao = sDaoSession.getColumnEntityDao();
         sArticleEntityDao = sDaoSession.getArticleEntityDao();
+        sArticleContentEntityDao = sDaoSession.getArticleContentEntityDao();
     }
 
     public static DaoSession getDaoSession() {
@@ -35,5 +38,9 @@ public class DbUtil {
 
     public static ArticleEntityDao getArticleEntityDao() {
         return sArticleEntityDao;
+    }
+
+    public static ArticleContentEntityDao getArticleContentEntityDao() {
+        return sArticleContentEntityDao;
     }
 }
