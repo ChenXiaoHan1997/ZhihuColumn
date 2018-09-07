@@ -55,7 +55,7 @@ public class DownloadArticleContentService extends IntentService {
                 Log.d("cxh", "--------------下载成功");
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
                 notifyForeground(articleSlug, true);
-                saveArticleContent(articleSlug, articleContent);
+                saveArticleContent(articleContent);
             }
 
             @Override
@@ -65,17 +65,19 @@ public class DownloadArticleContentService extends IntentService {
         });
     }
 
-    private void saveArticleContent(final String articleSlug, final ArticleContent articleContent) {
+    private void saveArticleContent(final ArticleContent articleContent) {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                FileUtil.saveText(FileUtil.HTMLS_DIR + File.separator + articleSlug, articleContent.getContent());
-                List<ArticleEntity> tmp = DbUtil.getArticleEntityDao().queryRaw("where " + ArticleEntityDao.Properties.Slug.columnName + " = ?", articleSlug);
-                if (tmp.size() > 0) {
-                    ArticleEntity articleEntity = tmp.get(0);
-                    articleEntity.setDownloadState(ArticleEntity.DOWNLOAD_SUCCESS);
-                    DbUtil.getArticleEntityDao().update(articleEntity);
-                }
+                FileUtil.saveText(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
+                List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
+                        .queryBuilder()
+                        .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
+                        .list();
+                ArticleEntity articleEntity = tmp.size() > 0?
+                        tmp.get(0): new ArticleEntity();
+                articleEntity.copyFromArticleContent(articleContent);
+                DbUtil.getArticleEntityDao().update(articleEntity);
             }
         });
     }

@@ -30,10 +30,10 @@ public class ArticleContentPagePresenter {
     }
 
     public void loadArticleContent(final String articleSlug) {
+        loadArticleContentLocal(articleSlug);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
             @Override
             public void onSuccess(String response) {
-                Log.d("cxh", "------------success-----------");
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
                 ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
                 mActivity.onArticleContentLoaded(articleEntity);
@@ -42,7 +42,7 @@ public class ArticleContentPagePresenter {
 
             @Override
             public void onFail() {
-                loadArticleContentLocal(articleSlug);
+//                loadArticleContentLocal(articleSlug);
             }
         });
     }
@@ -52,8 +52,13 @@ public class ArticleContentPagePresenter {
             @Override
             public void run() {
                 FileUtil.saveText(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
-                ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
-                articleEntity.setDownloadState(ArticleEntity.DOWNLOAD_SUCCESS);
+                List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
+                        .queryBuilder()
+                        .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
+                        .list();
+                ArticleEntity articleEntity = tmp.size() > 0?
+                        tmp.get(0): new ArticleEntity();
+                articleEntity.copyFromArticleContent(articleContent);
                 DbUtil.getArticleEntityDao().update(articleEntity);
             }
         });

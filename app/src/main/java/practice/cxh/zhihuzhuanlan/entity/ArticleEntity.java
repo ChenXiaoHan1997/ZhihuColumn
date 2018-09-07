@@ -64,7 +64,24 @@ public class ArticleEntity implements Serializable {
         articleEntity.author = "";
         articleEntity.avatar = "";
         articleEntity.content = "";
+        articleEntity.downloadState = NO_CACHE;
         return articleEntity;
+    }
+
+    public void copyFromArticleContent(ArticleContent articleContent) {
+        this.slug = articleContent.getSlug();
+        this.columnSlug = articleContent.getColumn() == null?
+                "": articleContent.getColumn().getSlug();
+        this.title = articleContent.getTitle();
+        this.publishedTime = articleContent.getPublishedTime();
+        this.titleImage = articleContent.getTitleImage();
+        this.author = articleContent.getAuthor() == null?
+                "": articleContent.getAuthor().getName();
+        this.avatar = StringUtil.getAvatarUrl(articleContent.getAuthor(), "m");
+        this.summary = articleContent.getSummary();
+        this.likesCount = articleContent.getLikesCount();
+        this.content = articleContent.getContent();
+        this.downloadState = DOWNLOAD_SUCCESS;
     }
 
     public static ArticleEntity convertFromArticleContent(ArticleContent articleContent) {
@@ -81,6 +98,7 @@ public class ArticleEntity implements Serializable {
         articleEntity.summary = articleContent.getSummary();
         articleEntity.likesCount = articleContent.getLikesCount();
         articleEntity.content = articleContent.getContent();
+        articleEntity.downloadState = DOWNLOAD_SUCCESS;
         return articleEntity;
     }
 
