@@ -9,8 +9,10 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -104,7 +106,12 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     private void initData() {
         mArticleEntity = (ArticleEntity) getIntent().getSerializableExtra(ARTICLE_ENTITY);
-        Glide.with(this).load(mArticleEntity.getTitleImage()).into(ivTitleImage);
+        if (TextUtils.isEmpty(mArticleEntity.getTitleImage())) {
+            ivTitleImage.setVisibility(View.GONE);
+//            mCollapsingToolbarLayout.setTitle(mArticleEntity.getTitle());
+        } else {
+            Glide.with(this).load(mArticleEntity.getTitleImage()).into(ivTitleImage);
+        }
         tvTitle.setText(mArticleEntity.getTitle());
         mPresenter = new ArticleContentPagePresenter(this);
         mPresenter.loadArticleContent(mArticleEntity.getSlug());
