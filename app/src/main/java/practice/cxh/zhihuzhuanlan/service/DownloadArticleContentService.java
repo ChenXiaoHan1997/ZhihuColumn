@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.File;
 import java.util.List;
 
+import practice.cxh.zhihuzhuanlan.Constants;
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
@@ -20,10 +21,6 @@ import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class DownloadArticleContentService extends IntentService {
-
-    public static final String BC_DOWNLOAD_FINISH = "practice.cxh.zhihuzhuanlan.DOWNLOAD_FINISH";
-    public static final String BC_SUCCESS = "success";
-    public static final String BC_SLUG = "article_slug";
 
     private static final String NAME = "downloadArticleContentService";
     private static final String ARTICLE_SLUG = "article_slug";
@@ -83,9 +80,9 @@ public class DownloadArticleContentService extends IntentService {
     }
 
     private void notifyForeground(String articleSlug, boolean success) {
-        Intent intent = new Intent(BC_DOWNLOAD_FINISH);
-        intent.putExtra(BC_SLUG, articleSlug);
-        intent.putExtra(BC_SUCCESS, success);
+        Intent intent = new Intent(Constants.BC_DOWNLOAD_FINISH);
+        intent.putExtra(Constants.BC_SLUG, articleSlug);
+        intent.putExtra(Constants.BC_SUCCESS, success);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

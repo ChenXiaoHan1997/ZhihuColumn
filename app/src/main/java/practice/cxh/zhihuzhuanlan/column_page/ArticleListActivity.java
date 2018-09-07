@@ -22,11 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import practice.cxh.zhihuzhuanlan.Constants;
 import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
@@ -92,14 +94,17 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         rvArticles.addOnScrollListener(mEndlessRecyclerOnScrollListener);
         swipeRefresh.setOnRefreshListener(mRefreshListener);
         // 注册监听后台下载广播
-        IntentFilter intentFilter = new IntentFilter(DownloadArticleContentService.BC_DOWNLOAD_FINISH);
+        IntentFilter intentFilter = new IntentFilter(Constants.BC_DOWNLOAD_FINISH);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDownloadFinishReicever, intentFilter);
     }
 
     private void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
-        Glide.with(this).load(mColumnEntity.getAvatar()).into(ivAvatar);
+        Glide.with(this)
+                .load(mColumnEntity.getAvatar())
+                .apply(new RequestOptions().placeholder(R.drawable.ic_launcher_foreground))
+                .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);
         mPresenter.loadArticleList(mColumnEntity.getSlug(), 0);
@@ -108,7 +113,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     @Override
     public void onStart() {
         super.onStart();
-        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -212,7 +217,14 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private BroadcastReceiver mDownloadFinishReicever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mAdapter.notifyDataSetChanged();
+            String slug = intent.getStringExtra(Constants.BC_SLUG);
+            for (int i = mArticleEntityList.size() - 1; i >= 0; i--) {
+                if (mArticleEntityList.get(i).getSlug().equals(slug)) {
+                    mAdapter.notifyItemChanged(i);
+                    break;
+                }
+            }
+//            mAdapter.notifyDataSetChanged();
         }
     };
 }

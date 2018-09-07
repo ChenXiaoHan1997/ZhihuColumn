@@ -1,15 +1,19 @@
 package practice.cxh.zhihuzhuanlan.article_page;
 
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
 
+import practice.cxh.zhihuzhuanlan.Constants;
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
+import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.FileUtil;
@@ -38,6 +42,7 @@ public class ArticleContentPagePresenter {
                 mLoadedFromNet = true;
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
                 ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
+                notifyArticleListPage(articleSlug, true);
                 mActivity.onArticleContentLoaded(articleEntity);
                 saveArticleContent(articleContent);
             }
@@ -63,8 +68,8 @@ public class ArticleContentPagePresenter {
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
                         .list();
                 // 此处先查询出同slug的对象，主要是为了使文章列表中的对象同步更新
-                ArticleEntity articleEntity = tmp.size() > 0?
-                        tmp.get(0): new ArticleEntity();
+                ArticleEntity articleEntity = tmp.size() > 0 ?
+                        tmp.get(0) : new ArticleEntity();
                 articleEntity.copyFromArticleContent(articleContent);
                 DbUtil.getArticleEntityDao().update(articleEntity);
             }
@@ -96,5 +101,13 @@ public class ArticleContentPagePresenter {
                 }
             }
         });
+    }
+
+    private void notifyArticleListPage(String articleSlug, boolean success) {
+        // TODO 发送广播
+        Intent intent = new Intent(Constants.BC_DOWNLOAD_FINISH);
+        intent.putExtra(Constants.BC_SLUG, articleSlug);
+        intent.putExtra(Constants.BC_SUCCESS, success);
+        LocalBroadcastManager.getInstance(mActivity).sendBroadcast(intent);
     }
 }

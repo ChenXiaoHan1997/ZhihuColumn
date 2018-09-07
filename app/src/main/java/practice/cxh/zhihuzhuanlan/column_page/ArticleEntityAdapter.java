@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
@@ -85,7 +86,10 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
                 itemViewHolder.ivPic.setVisibility(View.GONE);
             } else {
-                Glide.with(mContext).load(articleEntity.getTitleImage()).into(itemViewHolder.ivPic);
+                Glide.with(mContext)
+                        .load(articleEntity.getTitleImage())
+                        .apply(new RequestOptions().placeholder(R.drawable.ic_launcher_foreground))
+                        .into(itemViewHolder.ivPic);
             }
             itemViewHolder.tvTitle.setText(articleEntity.getTitle());
             itemViewHolder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
