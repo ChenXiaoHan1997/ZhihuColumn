@@ -119,6 +119,10 @@ public class ArticleContentActivity extends AppCompatActivity {
         wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
     }
 
+    public void onArticleContentLoadFail() {
+        wvContent.loadData(getString(R.string.fail_retry),"text/html; charset=UTF-8", null);
+    }
+
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView view, String url) {

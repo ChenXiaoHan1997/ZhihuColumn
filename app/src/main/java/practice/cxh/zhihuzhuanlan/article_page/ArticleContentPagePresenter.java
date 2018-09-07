@@ -38,6 +38,7 @@ public class ArticleContentPagePresenter {
 
             @Override
             public void onFail() {
+                mActivity.onArticleContentLoadFail();
 //                loadArticleContentLocal(articleSlug);
             }
         });
