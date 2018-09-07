@@ -11,6 +11,18 @@ import practice.cxh.zhihuzhuanlan.bean.Avatar;
 
 public class StringUtil {
 
+    public static String getAuthorAndTime(String author, String publishedTime) {
+        if (!TextUtils.isEmpty(author) && !TextUtils.isEmpty(publishedTime)) {
+            return author + "，" + publishedTime;
+        } else if (!TextUtils.isEmpty(author)) {
+            return author;
+        } else if (!TextUtils.isEmpty(publishedTime)) {
+            return publishedTime;
+        } else {
+            return "";
+        }
+    }
+
     /**
      * 获取头像的url
      * @param author

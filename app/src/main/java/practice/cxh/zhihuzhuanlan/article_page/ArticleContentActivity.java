@@ -18,6 +18,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -26,12 +27,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.util.HtmlUtil;
+import practice.cxh.zhihuzhuanlan.util.StringUtil;
 import practice.cxh.zhihuzhuanlan.util.TimeUtil;
 
 public class ArticleContentActivity extends AppCompatActivity {
 
     private static final String ARTICLE_ENTITY = "article_entity";
     private static final String JS_INTERFACE = "js_interface";
+    private static final String FAIL_RETRY_HTML = "file:///android_asset/fail_retry.html";
 
     private ArticleEntity mArticleEntity;
 
@@ -124,14 +127,16 @@ public class ArticleContentActivity extends AppCompatActivity {
                 .load(articleEntity.getAvatar())
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
-        tvAuthorAndTime.setText(String.format(getString(R.string.author_and_time), articleEntity.getAuthor(), TimeUtil.convertPublishTime(mArticleEntity.getPublishedTime())));
+        tvAuthorAndTime.setText(StringUtil.getAuthorAndTime(articleEntity.getAuthor(), TimeUtil.convertPublishTime(articleEntity.getPublishedTime())));
         wvContent.setWebViewClient(mWebViewClient);
         wvContent.addJavascriptInterface(this, JS_INTERFACE);
         wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
+        wvContent.setOnClickListener(null);
     }
 
     public void onArticleContentLoadFail() {
-        wvContent.loadData(getString(R.string.fail_retry),"text/html; charset=UTF-8", null);
+        wvContent.loadUrl(FAIL_RETRY_HTML);
+        wvContent.setOnClickListener(mWebViewClickListener);
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
@@ -158,6 +163,13 @@ public class ArticleContentActivity extends AppCompatActivity {
             } else {
                 mCollapsingToolbarLayout.setTitle("");
             }
+        }
+    };
+
+    private View.OnClickListener mWebViewClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(ArticleContentActivity.this, "retry", Toast.LENGTH_SHORT).show();
         }
     };
 
