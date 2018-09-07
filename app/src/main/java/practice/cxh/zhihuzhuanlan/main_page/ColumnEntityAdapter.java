@@ -49,7 +49,7 @@ public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapte
         holder.tvFollowersCount.setText(String.format(mContext.getString(R.string.followers_count), columnEntity.getFollowersCount()));
         Glide.with(mContext)
                 .load(columnEntity.getAvatar())
-                .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
+                .apply(new RequestOptions().placeholder(R.drawable.liukanshan_square))
                 .into(holder.ivPic);
     }
 

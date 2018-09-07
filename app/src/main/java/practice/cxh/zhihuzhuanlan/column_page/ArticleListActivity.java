@@ -205,6 +205,16 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
             }
         }
+
+        @Override
+        protected void onStartScrolling() {
+            Glide.with(ArticleListActivity.this).pauseRequests();
+        }
+
+        @Override
+        protected void onStopScrolling() {
+            Glide.with(ArticleListActivity.this).resumeRequests();
+        }
     };
 
     private SwipeRefreshLayout.OnRefreshListener mRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {

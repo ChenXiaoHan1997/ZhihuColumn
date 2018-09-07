@@ -12,11 +12,14 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
         super.onScrollStateChanged(recyclerView, newState);
         LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+            onStopScrolling();
             int lastItemPosition = manager.findLastCompletelyVisibleItemPosition();
             int itemCount = manager.getItemCount();
             if (lastItemPosition == (itemCount - 1) && isSlidingUpward) {
                 onLoadMore();
             }
+        } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
+            onStartScrolling();
         }
     }
 
@@ -26,5 +29,7 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
         isSlidingUpward = dy > 0;
     }
 
-    public abstract void onLoadMore();
+    protected abstract void onLoadMore();
+    protected abstract void onStartScrolling();
+    protected abstract void onStopScrolling();
 }
