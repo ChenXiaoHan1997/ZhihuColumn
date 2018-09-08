@@ -49,6 +49,7 @@ public class ArticleContentActivity extends AppCompatActivity {
     private CircleImageView ivAvatar;
     private TextView tvAuthorAndTime;
     private WebView wvContent;
+    private TextView tvFailRetry;
     private Toolbar toolbar;
 
     public static void launch(Activity activity, ArticleEntity articleEntity) {
@@ -80,6 +81,7 @@ public class ArticleContentActivity extends AppCompatActivity {
         ivAvatar = findViewById(R.id.iv_avatar);
         tvAuthorAndTime = findViewById(R.id.tv_author_time);
         wvContent = findViewById(R.id.wv_content);
+        tvFailRetry = findViewById(R.id.tv_fail_retry);
     }
 
     private void initToolbar() {
@@ -129,6 +131,8 @@ public class ArticleContentActivity extends AppCompatActivity {
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvAuthorAndTime.setText(StringUtil.getAuthorAndTime(articleEntity.getAuthor(), TimeUtil.convertPublishTime(articleEntity.getPublishedTime())));
+        wvContent.setVisibility(View.VISIBLE);
+        tvFailRetry.setVisibility(View.GONE);
         wvContent.setWebViewClient(mWebViewClient);
         wvContent.addJavascriptInterface(this, JS_INTERFACE);
         wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
@@ -136,8 +140,8 @@ public class ArticleContentActivity extends AppCompatActivity {
     }
 
     public void onArticleContentLoadFail() {
-        wvContent.loadUrl(FAIL_RETRY_HTML);
-        wvContent.setOnClickListener(mWebViewClickListener);
+        wvContent.setVisibility(View.GONE);
+        tvFailRetry.setVisibility(View.VISIBLE);
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
