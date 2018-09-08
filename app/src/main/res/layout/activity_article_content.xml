@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
             app:contentScrim="@color/colorPrimary"
+            app:toolbarId="@id/tb_article_content"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView

@@ -88,7 +88,7 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
             } else {
                 itemViewHolder.ivPic.setVisibility(View.VISIBLE);
                 Glide.with(mContext)
-                        .load(articleEntity.getTitleImage())
+                        .load(articleEntity.getTitleImage().replaceAll("_r", "_l"))
                         .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                         .into(itemViewHolder.ivPic);
             }

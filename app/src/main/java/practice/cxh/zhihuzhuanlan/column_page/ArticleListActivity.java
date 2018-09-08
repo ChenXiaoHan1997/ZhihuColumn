@@ -208,12 +208,12 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
         @Override
         protected void onStartScrolling() {
-            Glide.with(ArticleListActivity.this).pauseRequests();
+//            Glide.with(ArticleListActivity.this).pauseRequests();
         }
 
         @Override
         protected void onStopScrolling() {
-            Glide.with(ArticleListActivity.this).resumeRequests();
+//            Glide.with(ArticleListActivity.this).resumeRequests();
         }
     };
 

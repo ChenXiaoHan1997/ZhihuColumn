@@ -112,7 +112,8 @@ public class ArticleContentActivity extends AppCompatActivity {
         mArticleEntity = (ArticleEntity) getIntent().getSerializableExtra(ARTICLE_ENTITY);
         if (TextUtils.isEmpty(mArticleEntity.getTitleImage())) {
             ivTitleImage.setVisibility(View.GONE);
-//            mCollapsingToolbarLayout.setTitle(mArticleEntity.getTitle());
+            mCollapsingToolbarLayout.setTitleEnabled(false);
+            getSupportActionBar().setTitle(mArticleEntity.getTitle());
         } else {
             Glide.with(this).load(mArticleEntity.getTitleImage()).into(ivTitleImage);
         }
