@@ -86,6 +86,8 @@
                 android:id="@+id/tv_fail_retry"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingTop="60dp"
+                android:paddingBottom="60dp"
                 android:gravity="center"
                 android:text="@string/fail_retry"
                 android:visibility="gone"/>

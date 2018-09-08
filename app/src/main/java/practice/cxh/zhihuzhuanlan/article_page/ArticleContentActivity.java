@@ -126,6 +126,7 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     public void onArticleContentLoaded(ArticleEntity articleEntity) {
 //        wvContent.getSettings().setJavaScriptEnabled(true);
+        Glide.with(this).load(articleEntity.getTitleImage()).into(ivTitleImage);
         Glide.with(this)
                 .load(articleEntity.getAvatar())
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
@@ -133,6 +134,7 @@ public class ArticleContentActivity extends AppCompatActivity {
         tvAuthorAndTime.setText(StringUtil.getAuthorAndTime(articleEntity.getAuthor(), TimeUtil.convertPublishTime(articleEntity.getPublishedTime())));
         wvContent.setVisibility(View.VISIBLE);
         tvFailRetry.setVisibility(View.GONE);
+        tvFailRetry.setOnClickListener(null);
         wvContent.setWebViewClient(mWebViewClient);
         wvContent.addJavascriptInterface(this, JS_INTERFACE);
         wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
@@ -142,6 +144,12 @@ public class ArticleContentActivity extends AppCompatActivity {
     public void onArticleContentLoadFail() {
         wvContent.setVisibility(View.GONE);
         tvFailRetry.setVisibility(View.VISIBLE);
+        tvFailRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.loadArticleContent(mArticleEntity.getSlug());
+            }
+        });
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
