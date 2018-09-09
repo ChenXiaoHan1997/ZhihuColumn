@@ -81,7 +81,7 @@ public class ArticleEntity implements Serializable {
         this.avatar = StringUtil.getAvatarUrl(articleContent.getAuthor(), "m");
         this.summary = articleContent.getSummary();
         this.likesCount = articleContent.getLikesCount();
-        this.content = HtmlUtil.getHtmlData1(articleContent.getContent(), true);
+        this.content = HtmlUtil.getHtmlData(articleContent.getContent(), true);
         this.downloadState = DOWNLOAD_SUCCESS;
     }
 
@@ -98,7 +98,7 @@ public class ArticleEntity implements Serializable {
         articleEntity.avatar = StringUtil.getAvatarUrl(articleContent.getAuthor(), "m");
         articleEntity.summary = articleContent.getSummary();
         articleEntity.likesCount = articleContent.getLikesCount();
-        articleEntity.content = HtmlUtil.getHtmlData1(articleContent.getContent(), true);
+        articleEntity.content = HtmlUtil.getHtmlData(articleContent.getContent(), true);
         articleEntity.downloadState = DOWNLOAD_SUCCESS;
         return articleEntity;
     }

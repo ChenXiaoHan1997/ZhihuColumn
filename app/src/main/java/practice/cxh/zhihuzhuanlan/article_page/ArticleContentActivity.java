@@ -39,7 +39,7 @@ import practice.cxh.zhihuzhuanlan.util.TimeUtil;
 public class ArticleContentActivity extends AppCompatActivity {
 
     private static final String ARTICLE_ENTITY = "article_entity";
-    private static final String JS_INTERFACE = "js_interface";
+    private static final String JS_INTERFACE = "imageListener";
     private static final String FAIL_RETRY_HTML = "file:///android_asset/fail_retry.html";
 
     private ArticleEntity mArticleEntity;
@@ -102,8 +102,7 @@ public class ArticleContentActivity extends AppCompatActivity {
     }
 
     private void initWebView() {
-//        wvContent.addJavascriptInterface(this, JS_INTERFACE);
-//        wvContent.addJavascriptInterface(this, "imageListener");
+        wvContent.addJavascriptInterface(this, JS_INTERFACE);
         wvContent.getSettings().setJavaScriptEnabled(true);
     }
 
@@ -147,14 +146,8 @@ public class ArticleContentActivity extends AppCompatActivity {
         tvFailRetry.setVisibility(View.GONE);
         tvFailRetry.setOnClickListener(null);
         wvContent.setVisibility(View.VISIBLE);
-//        wvContent.loadUrl("file:///android_asset/zhihu3.html");
-//        wvContent.addJavascriptInterface(this, "imageListener");
         wvContent.loadData(articleEntity.getContent(),"text/html; charset=UTF-8", null);
-        wvContent.addJavascriptInterface(this, "imageListener");
-        //        String html = getHtmlData(articleEntity.getContent(), mIsWifi);
-//        wvContent.loadData(html, "text/html; charset=UTF-8", null);
-//        wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
-    }
+        }
 
     public void onArticleContentLoadFail() {
         wvContent.setVisibility(View.GONE);
@@ -179,38 +172,7 @@ public class ArticleContentActivity extends AppCompatActivity {
     };
 
     @JavascriptInterface
-    private void showBigImage() {
+    public void showBigImage() {
         Log.d("tag1", "show big image: ");
-    }
-
-    @JavascriptInterface
-    public void onImageClick() {
-        Log.d("tag1", "onImageClick");
-    }
-
-    public String getHtmlData(String htmlBody, boolean displayPic) {
-        String head = "<head><style>img{max-width: 100%; width:auto; height: auto;}</style></head>";
-        htmlBody = htmlBody.replaceAll("<noscript>", "")
-                .replaceAll("</noscript>", "");
-        if (!displayPic) {
-            htmlBody = htmlBody.replaceAll("<img .*?>", "");
-        }
-        Log.d("tag1", readFile("set_image_click_js.txt"));
-        return "<html>" + head + "<body>" + htmlBody + "</body>" + readFile("set_image_click_js.txt") + "</html>";
-    }
-
-    private String readFile(String fileName) {
-        AssetManager manager = getAssets();
-        try {
-            Scanner scanner = new Scanner(manager.open(fileName));
-            StringBuilder builder = new StringBuilder();
-            while (scanner.hasNext()) {
-                builder.append(scanner.nextLine());
-            }
-            return builder.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
     }
 }
