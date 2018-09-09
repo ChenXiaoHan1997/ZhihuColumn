@@ -29,7 +29,8 @@ public class MainpagePresenter {
      */
     public void loadColums() {
         for (final String columnSlug : columnsSlugs) {
-            HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug, new HttpUtil.HttpListener() {
+            HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
+                    new HttpUtil.HttpListener<String>() {
                 @Override
                 public void onSuccess(String response) {
                     Column column = JsonUtil.decodeColumn(response);

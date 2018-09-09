@@ -16,6 +16,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
+import practice.cxh.zhihuzhuanlan.article_page.ByteArrayRequest;
 
 public class HttpUtil {
 
@@ -39,7 +40,7 @@ public class HttpUtil {
         this.mRequestQueue = Volley.newRequestQueue(mContext);
     }
 
-    public static void get(String url, final HttpListener httpListener) {
+    public static void get(String url, final HttpListener<String> httpListener) {
         StringRequest request = new StringRequest(Request.Method.GET,
                 url,
                 new Response.Listener<String>() {
@@ -57,8 +58,26 @@ public class HttpUtil {
         sRequestQueue.add(request);
     }
 
-    public interface HttpListener {
-        void onSuccess(String response);
+    public static void getBytes(String url, final HttpListener<byte[]> httpListener) {
+        ByteArrayRequest request = new ByteArrayRequest(Request.Method.GET,
+                url,
+                new Response.Listener<byte[]>() {
+                    @Override
+                    public void onResponse(byte[] bytes) {
+                        httpListener.onSuccess(bytes);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        httpListener.onFail();
+                    }
+                });
+        sRequestQueue.add(request);
+    }
+
+    public interface HttpListener<T> {
+        void onSuccess(T response);
         void onFail();
     }
 }

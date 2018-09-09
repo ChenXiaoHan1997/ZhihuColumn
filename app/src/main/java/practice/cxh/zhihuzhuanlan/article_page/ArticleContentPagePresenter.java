@@ -34,7 +34,8 @@ public class ArticleContentPagePresenter {
     public void loadArticleContent(final String articleSlug) {
         // 首先加载本地的数据
         loadArticleContentLocal(articleSlug);
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
+        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
+                new HttpUtil.HttpListener<String>() {
             @Override
             public void onSuccess(String response) {
                 mLoadedFromNet = true;

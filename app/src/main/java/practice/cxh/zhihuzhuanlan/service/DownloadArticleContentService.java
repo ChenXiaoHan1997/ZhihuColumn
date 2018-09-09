@@ -45,11 +45,12 @@ public class DownloadArticleContentService extends IntentService {
             return;
         }
         final String articleSlug = intent.getStringExtra(ARTICLE_SLUG);
-        Log.d("cxh", "try download " + articleSlug);
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug, new HttpUtil.HttpListener() {
+        Log.d("tag1", "try download " + articleSlug);
+        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
+                new HttpUtil.HttpListener<String>() {
             @Override
             public void onSuccess(String response) {
-                Log.d("cxh", "--------------下载成功");
+                Log.d("tag1", "--------------下载成功");
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
                 notifyForeground(articleSlug, true);
                 saveArticleContent(articleContent);

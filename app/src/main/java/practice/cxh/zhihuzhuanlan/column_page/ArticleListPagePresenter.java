@@ -31,7 +31,7 @@ public class ArticleListPagePresenter {
     public void loadArticleList(final String columnSlug, final int offset) {
         // TODO 先从数据库加载
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug + "/" + HttpUtil.POSTS + "?offset=" + offset,
-                new HttpUtil.HttpListener() {
+                new HttpUtil.HttpListener<String>() {
             @Override
             public void onSuccess(String response) {
                 List<Article> articlesList = JsonUtil.decodeArticleList(response);
