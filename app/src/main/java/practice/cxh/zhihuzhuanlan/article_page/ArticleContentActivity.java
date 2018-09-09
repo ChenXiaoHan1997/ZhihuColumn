@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.article_page;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
@@ -22,6 +25,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+
+import java.io.IOException;
+import java.util.Scanner;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.R;
@@ -33,7 +39,7 @@ import practice.cxh.zhihuzhuanlan.util.TimeUtil;
 public class ArticleContentActivity extends AppCompatActivity {
 
     private static final String ARTICLE_ENTITY = "article_entity";
-    private static final String JS_INTERFACE = "js_interface";
+    private static final String JS_INTERFACE = "imageListener";
     private static final String FAIL_RETRY_HTML = "file:///android_asset/fail_retry.html";
 
     private ArticleEntity mArticleEntity;
@@ -63,6 +69,7 @@ public class ArticleContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initView();
         initToolbar();
+        initWebView();
         registerListenerAndReceiver();
         checkWifi();
         initData();
@@ -92,6 +99,11 @@ public class ArticleContentActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_arrow_back_ios_white);
         }
+    }
+
+    private void initWebView() {
+        wvContent.addJavascriptInterface(this, JS_INTERFACE);
+        wvContent.getSettings().setJavaScriptEnabled(true);
     }
 
     @Override
@@ -125,20 +137,17 @@ public class ArticleContentActivity extends AppCompatActivity {
     }
 
     public void onArticleContentLoaded(ArticleEntity articleEntity) {
-        wvContent.getSettings().setJavaScriptEnabled(true);
         Glide.with(this).load(articleEntity.getTitleImage()).into(ivTitleImage);
         Glide.with(this)
                 .load(articleEntity.getAvatar())
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvAuthorAndTime.setText(StringUtil.getAuthorAndTime(articleEntity.getAuthor(), TimeUtil.convertPublishTime(articleEntity.getPublishedTime())));
-        wvContent.setVisibility(View.VISIBLE);
         tvFailRetry.setVisibility(View.GONE);
         tvFailRetry.setOnClickListener(null);
-        wvContent.setWebViewClient(mWebViewClient);
-        wvContent.addJavascriptInterface(this, JS_INTERFACE);
-        wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
-    }
+        wvContent.setVisibility(View.VISIBLE);
+        wvContent.loadData(articleEntity.getContent(),"text/html; charset=UTF-8", null);
+        }
 
     public void onArticleContentLoadFail() {
         wvContent.setVisibility(View.GONE);
@@ -150,22 +159,6 @@ public class ArticleContentActivity extends AppCompatActivity {
             }
         });
     }
-
-    private WebViewClient mWebViewClient = new WebViewClient() {
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            wvContent.loadUrl("javascript:(function(){" +
-                    "var objs = document.getElementsByTagName(\"img\"); " +
-                    "for(var i=0;i<objs.length;i++)  " +
-                    "{"
-                    + "    objs[i].onclick=function()  " +
-                    "    {  "
-                    + "        window." + JS_INTERFACE + ".showBigImage(this.src);  " +
-                    "    }  " +
-                    "}" +
-                    "})()");
-        }
-    };
 
     private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
         @Override
@@ -179,7 +172,7 @@ public class ArticleContentActivity extends AppCompatActivity {
     };
 
     @JavascriptInterface
-    private void showBigImage(String url) {
-        Log.d("cxh", "show big image: " + url);
+    public void showBigImage() {
+        Log.d("tag1", "show big image: ");
     }
 }

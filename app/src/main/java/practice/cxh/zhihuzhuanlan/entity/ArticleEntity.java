@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 import practice.cxh.zhihuzhuanlan.bean.Article;
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
+import practice.cxh.zhihuzhuanlan.util.HtmlUtil;
 import practice.cxh.zhihuzhuanlan.util.StringUtil;
 
 @Entity
@@ -80,7 +81,7 @@ public class ArticleEntity implements Serializable {
         this.avatar = StringUtil.getAvatarUrl(articleContent.getAuthor(), "m");
         this.summary = articleContent.getSummary();
         this.likesCount = articleContent.getLikesCount();
-        this.content = articleContent.getContent();
+        this.content = HtmlUtil.getHtmlData(articleContent.getContent(), true);
         this.downloadState = DOWNLOAD_SUCCESS;
     }
 
@@ -97,7 +98,7 @@ public class ArticleEntity implements Serializable {
         articleEntity.avatar = StringUtil.getAvatarUrl(articleContent.getAuthor(), "m");
         articleEntity.summary = articleContent.getSummary();
         articleEntity.likesCount = articleContent.getLikesCount();
-        articleEntity.content = articleContent.getContent();
+        articleEntity.content = HtmlUtil.getHtmlData(articleContent.getContent(), true);
         articleEntity.downloadState = DOWNLOAD_SUCCESS;
         return articleEntity;
     }
