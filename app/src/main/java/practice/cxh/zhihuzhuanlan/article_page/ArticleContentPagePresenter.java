@@ -47,7 +47,7 @@ public class ArticleContentPagePresenter {
             }
 
             @Override
-            public void onFail() {
+            public void onFail(String detail) {
                 if (!mLoadedFromLocal && !mLoadedFromNet) {
                     mActivity.onArticleContentLoadFail();
                 }

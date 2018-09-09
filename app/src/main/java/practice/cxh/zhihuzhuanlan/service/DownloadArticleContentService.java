@@ -57,7 +57,7 @@ public class DownloadArticleContentService extends IntentService {
             }
 
             @Override
-            public void onFail() {
+            public void onFail(String detail) {
                 notifyForeground(articleSlug, false);
             }
         });

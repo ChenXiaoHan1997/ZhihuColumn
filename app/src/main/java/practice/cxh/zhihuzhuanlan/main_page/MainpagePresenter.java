@@ -42,7 +42,7 @@ public class MainpagePresenter {
                 }
 
                 @Override
-                public void onFail() {
+                public void onFail(String detail) {
                     // 加载失败，读取本地数据
                     loadColumnEntityFromDB(columnSlug);
                 }

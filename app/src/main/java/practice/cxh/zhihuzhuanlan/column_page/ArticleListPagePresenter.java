@@ -54,7 +54,7 @@ public class ArticleListPagePresenter {
             }
 
             @Override
-            public void onFail() {
+            public void onFail(String detail) {
                 loadArticleListFromDB(columnSlug);
             }
         });

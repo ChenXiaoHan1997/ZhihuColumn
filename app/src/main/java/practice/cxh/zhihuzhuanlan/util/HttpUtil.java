@@ -16,6 +16,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
+import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.article_page.ByteArrayRequest;
 
 public class HttpUtil {
@@ -24,20 +25,12 @@ public class HttpUtil {
     public static final String COLUMN = "columns";
     public static final String POSTS = "posts";
 
-    private Context mContext;
-    private RequestQueue mRequestQueue;
-
     private static Context sContext;
     private static RequestQueue sRequestQueue;
 
     public static void init(Application application) {
         sContext = application;
         sRequestQueue = Volley.newRequestQueue(sContext);
-    }
-
-    public HttpUtil(Context context) {
-        this.mContext = context;
-        this.mRequestQueue = Volley.newRequestQueue(mContext);
     }
 
     public static void get(String url, final HttpListener<String> httpListener) {
@@ -52,7 +45,8 @@ public class HttpUtil {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        httpListener.onFail();
+                        httpListener.onFail(String.format(sContext.getString(R.string.http_error),
+                                volleyError.networkResponse.statusCode));
                     }
                 });
         sRequestQueue.add(request);
@@ -70,7 +64,8 @@ public class HttpUtil {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        httpListener.onFail();
+                        httpListener.onFail(String.format(sContext.getString(R.string.http_error),
+                                volleyError.networkResponse.statusCode));
                     }
                 });
         sRequestQueue.add(request);
@@ -78,6 +73,6 @@ public class HttpUtil {
 
     public interface HttpListener<T> {
         void onSuccess(T response);
-        void onFail();
+        void onFail(String detail);
     }
 }
