@@ -102,8 +102,8 @@ public class ArticleContentActivity extends AppCompatActivity {
     }
 
     private void initWebView() {
-        wvContent.setWebViewClient(mWebViewClient);
-        wvContent.addJavascriptInterface(this, JS_INTERFACE);
+//        wvContent.addJavascriptInterface(this, JS_INTERFACE);
+//        wvContent.addJavascriptInterface(this, "imageListener");
         wvContent.getSettings().setJavaScriptEnabled(true);
     }
 
@@ -147,14 +147,12 @@ public class ArticleContentActivity extends AppCompatActivity {
         tvFailRetry.setVisibility(View.GONE);
         tvFailRetry.setOnClickListener(null);
         wvContent.setVisibility(View.VISIBLE);
-        String html = getHtmlData(articleEntity.getContent(), mIsWifi);
-        wvContent.loadData(html, "text/html; charset=UTF-8", null);
-        wvContent.setWebChromeClient(new WebChromeClient(){
-            @Override
-            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-                return super.onJsAlert(view, url, message, result);
-            }
-        });
+//        wvContent.loadUrl("file:///android_asset/zhihu3.html");
+//        wvContent.addJavascriptInterface(this, "imageListener");
+        wvContent.loadData(articleEntity.getContent(),"text/html; charset=UTF-8", null);
+        wvContent.addJavascriptInterface(this, "imageListener");
+        //        String html = getHtmlData(articleEntity.getContent(), mIsWifi);
+//        wvContent.loadData(html, "text/html; charset=UTF-8", null);
 //        wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
     }
 
@@ -168,22 +166,6 @@ public class ArticleContentActivity extends AppCompatActivity {
             }
         });
     }
-
-    private WebViewClient mWebViewClient = new WebViewClient() {
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            wvContent.loadUrl("javascript:(function(){" +
-                    "var objs = document.getElementsByTagName(\"img\"); " +
-                    "for(var i=0;i<objs.length;i++)  " +
-                    "{"
-                    + "    objs[i].onclick=function()  " +
-                    "    {  "
-                    + "        window." + JS_INTERFACE + ".showBigImage(this.src);  " +
-                    "    }  " +
-                    "}" +
-                    "})()");
-        }
-    };
 
     private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
         @Override
@@ -199,6 +181,11 @@ public class ArticleContentActivity extends AppCompatActivity {
     @JavascriptInterface
     private void showBigImage() {
         Log.d("tag1", "show big image: ");
+    }
+
+    @JavascriptInterface
+    public void onImageClick() {
+        Log.d("tag1", "onImageClick");
     }
 
     public String getHtmlData(String htmlBody, boolean displayPic) {

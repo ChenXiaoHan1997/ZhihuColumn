@@ -66,7 +66,6 @@ public class DownloadArticleContentService extends IntentService {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
                 List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
                         .queryBuilder()
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
@@ -74,6 +73,7 @@ public class DownloadArticleContentService extends IntentService {
                 ArticleEntity articleEntity = tmp.size() > 0?
                         tmp.get(0): new ArticleEntity();
                 articleEntity.copyFromArticleContent(articleContent);
+                FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleEntity.getContent());
                 DbUtil.getArticleEntityDao().update(articleEntity);
             }
         });
