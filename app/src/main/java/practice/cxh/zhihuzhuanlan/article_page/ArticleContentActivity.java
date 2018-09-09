@@ -178,13 +178,6 @@ public class ArticleContentActivity extends AppCompatActivity {
         }
     };
 
-    private View.OnClickListener mWebViewClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Toast.makeText(ArticleContentActivity.this, "retry", Toast.LENGTH_SHORT).show();
-        }
-    };
-
     @JavascriptInterface
     private void showBigImage(String url) {
         Log.d("cxh", "show big image: " + url);
