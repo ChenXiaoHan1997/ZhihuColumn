@@ -5,6 +5,9 @@ package practice.cxh.zhihuzhuanlan.util;
  */
 
 public class HtmlUtil {
+
+    private static final String IMAGE_CLICK_JS_FILE = "set_image_click_js.txt";
+
     public static String getHtmlData(String htmlBody, boolean displayPic) {
         String head = "<head><style>img{max-width: 100%; width:auto; height: auto;}</style></head>";
         htmlBody = htmlBody.replaceAll("<noscript>", "")
@@ -12,6 +15,6 @@ public class HtmlUtil {
         if (!displayPic) {
             htmlBody = htmlBody.replaceAll("<img .*?>", "");
         }
-        return "<html>" + head + "<body>" + htmlBody + "</body></html>";
+        return "<html>" + head + "<body>" + htmlBody + "</body>" + FileUtil.readTextFromAssets("set_image_click_js.txt") + "</html>";
     }
 }

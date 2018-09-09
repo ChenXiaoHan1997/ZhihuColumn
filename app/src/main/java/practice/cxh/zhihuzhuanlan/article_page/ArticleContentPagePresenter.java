@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
@@ -13,7 +12,6 @@ import practice.cxh.zhihuzhuanlan.Constants;
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
-import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.FileUtil;
@@ -61,7 +59,7 @@ public class ArticleContentPagePresenter {
             @Override
             public void run() {
                 // 将文章内容html保存到files/htmls/<slug>中
-                FileUtil.saveText(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
+                FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
                 // 将文章的作者、头像等信息保存到数据库
                 List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
                         .queryBuilder()
@@ -86,7 +84,7 @@ public class ArticleContentPagePresenter {
                         .list();
                 if (articleEntityList.size() > 0) {
                     final ArticleEntity articleEntity = articleEntityList.get(0);
-                    String content = FileUtil.readText(FileUtil.HTMLS_DIR + File.separator + articleSlug);
+                    String content = FileUtil.readTextFromFile(FileUtil.HTMLS_DIR + File.separator + articleSlug);
                     if (TextUtils.isEmpty(content)) {
                         return;
                     }

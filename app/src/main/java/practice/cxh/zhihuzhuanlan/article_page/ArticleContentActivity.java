@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.article_page;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
@@ -22,6 +25,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+
+import java.io.IOException;
+import java.util.Scanner;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.R;
@@ -63,6 +69,7 @@ public class ArticleContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initView();
         initToolbar();
+        initWebView();
         registerListenerAndReceiver();
         checkWifi();
         initData();
@@ -92,6 +99,12 @@ public class ArticleContentActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_arrow_back_ios_white);
         }
+    }
+
+    private void initWebView() {
+        wvContent.setWebViewClient(mWebViewClient);
+        wvContent.addJavascriptInterface(this, JS_INTERFACE);
+        wvContent.getSettings().setJavaScriptEnabled(true);
     }
 
     @Override
@@ -125,19 +138,24 @@ public class ArticleContentActivity extends AppCompatActivity {
     }
 
     public void onArticleContentLoaded(ArticleEntity articleEntity) {
-        wvContent.getSettings().setJavaScriptEnabled(true);
         Glide.with(this).load(articleEntity.getTitleImage()).into(ivTitleImage);
         Glide.with(this)
                 .load(articleEntity.getAvatar())
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvAuthorAndTime.setText(StringUtil.getAuthorAndTime(articleEntity.getAuthor(), TimeUtil.convertPublishTime(articleEntity.getPublishedTime())));
-        wvContent.setVisibility(View.VISIBLE);
         tvFailRetry.setVisibility(View.GONE);
         tvFailRetry.setOnClickListener(null);
-        wvContent.setWebViewClient(mWebViewClient);
-        wvContent.addJavascriptInterface(this, JS_INTERFACE);
-        wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
+        wvContent.setVisibility(View.VISIBLE);
+        String html = getHtmlData(articleEntity.getContent(), mIsWifi);
+        wvContent.loadData(html, "text/html; charset=UTF-8", null);
+        wvContent.setWebChromeClient(new WebChromeClient(){
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                return super.onJsAlert(view, url, message, result);
+            }
+        });
+//        wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
     }
 
     public void onArticleContentLoadFail() {
@@ -178,15 +196,34 @@ public class ArticleContentActivity extends AppCompatActivity {
         }
     };
 
-    private View.OnClickListener mWebViewClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Toast.makeText(ArticleContentActivity.this, "retry", Toast.LENGTH_SHORT).show();
-        }
-    };
-
     @JavascriptInterface
-    private void showBigImage(String url) {
-        Log.d("cxh", "show big image: " + url);
+    private void showBigImage() {
+        Log.d("tag1", "show big image: ");
+    }
+
+    public String getHtmlData(String htmlBody, boolean displayPic) {
+        String head = "<head><style>img{max-width: 100%; width:auto; height: auto;}</style></head>";
+        htmlBody = htmlBody.replaceAll("<noscript>", "")
+                .replaceAll("</noscript>", "");
+        if (!displayPic) {
+            htmlBody = htmlBody.replaceAll("<img .*?>", "");
+        }
+        Log.d("tag1", readFile("set_image_click_js.txt"));
+        return "<html>" + head + "<body>" + htmlBody + "</body>" + readFile("set_image_click_js.txt") + "</html>";
+    }
+
+    private String readFile(String fileName) {
+        AssetManager manager = getAssets();
+        try {
+            Scanner scanner = new Scanner(manager.open(fileName));
+            StringBuilder builder = new StringBuilder();
+            while (scanner.hasNext()) {
+                builder.append(scanner.nextLine());
+            }
+            return builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

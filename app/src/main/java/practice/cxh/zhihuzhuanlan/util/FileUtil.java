@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.util;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Scanner;
 
 /**
  * Created by Administrator on 2018/9/1 0001.
@@ -34,7 +36,22 @@ public class FileUtil {
         }
     }
 
-    public static boolean saveText(String relativePath, String txt) {
+    public static String readTextFromAssets(String relativePath) {
+        AssetManager manager = sContext.getAssets();
+        try {
+            Scanner scanner = new Scanner(manager.open(relativePath));
+            StringBuilder builder = new StringBuilder();
+            while (scanner.hasNext()) {
+                builder.append(scanner.nextLine());
+            }
+            return builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static boolean saveTextToFile(String relativePath, String txt) {
         String absolutePath = sFilesDir.getAbsolutePath() + File.separator + relativePath;
         FileOutputStream outputStream = null;
         BufferedWriter writer = null;
@@ -56,7 +73,7 @@ public class FileUtil {
         }
     }
 
-    public static String readText(String relativePath) {
+    public static String readTextFromFile(String relativePath) {
         String absolutePath = sFilesDir.getAbsolutePath() + File.separator + relativePath;
         FileInputStream inputStream = null;
         BufferedReader reader = null;

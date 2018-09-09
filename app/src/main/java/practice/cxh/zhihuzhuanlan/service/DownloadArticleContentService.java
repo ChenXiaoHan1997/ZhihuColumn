@@ -66,7 +66,7 @@ public class DownloadArticleContentService extends IntentService {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                FileUtil.saveText(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
+                FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleContent.getContent());
                 List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
                         .queryBuilder()
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
