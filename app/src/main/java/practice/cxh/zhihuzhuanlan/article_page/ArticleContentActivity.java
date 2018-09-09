@@ -125,7 +125,7 @@ public class ArticleContentActivity extends AppCompatActivity {
     }
 
     public void onArticleContentLoaded(ArticleEntity articleEntity) {
-//        wvContent.getSettings().setJavaScriptEnabled(true);
+        wvContent.getSettings().setJavaScriptEnabled(true);
         Glide.with(this).load(articleEntity.getTitleImage()).into(ivTitleImage);
         Glide.with(this)
                 .load(articleEntity.getAvatar())
@@ -138,7 +138,6 @@ public class ArticleContentActivity extends AppCompatActivity {
         wvContent.setWebViewClient(mWebViewClient);
         wvContent.addJavascriptInterface(this, JS_INTERFACE);
         wvContent.loadData(HtmlUtil.getHtmlData(articleEntity.getContent(), mIsWifi), "text/html; charset=UTF-8", null);
-        wvContent.setOnClickListener(null);
     }
 
     public void onArticleContentLoadFail() {
