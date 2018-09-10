@@ -67,12 +67,15 @@ public class DownloadArticleContentService extends IntentService {
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
+                // 将文章的作者、头像等信息保存到数据库
+                ArticleEntity tmp = DbUtil.getArticleEntityDao()
                         .queryBuilder()
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
-                        .list();
-                ArticleEntity articleEntity = tmp.size() > 0?
-                        tmp.get(0): new ArticleEntity();
+                        .unique();
+                // 此处先查询出同slug的对象，主要是为了使文章列表中的对象同步更新
+                ArticleEntity articleEntity = tmp == null?
+                        new ArticleEntity(): tmp;
+                articleEntity.copyFromArticleContent(articleContent);
                 articleEntity.copyFromArticleContent(articleContent);
                 FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleEntity.getContent());
                 DbUtil.getArticleEntityDao().update(articleEntity);

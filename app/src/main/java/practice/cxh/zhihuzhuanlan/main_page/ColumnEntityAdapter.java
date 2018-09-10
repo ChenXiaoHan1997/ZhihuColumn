@@ -23,14 +23,17 @@ public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapte
     private List<ColumnEntity> mColumnEntities;
     private Context mContext;
 
+    private LayoutInflater mLayoutInflater;
+
     public ColumnEntityAdapter(Context context, List<ColumnEntity> columnEntities) {
         this.mColumnEntities = columnEntities;
         this.mContext = context;
+        this.mLayoutInflater = LayoutInflater.from(mContext);
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_column, parent, false);
+        View itemView = mLayoutInflater.inflate(R.layout.item_column, parent, false);
         return new ViewHolder(itemView);
     }
 
