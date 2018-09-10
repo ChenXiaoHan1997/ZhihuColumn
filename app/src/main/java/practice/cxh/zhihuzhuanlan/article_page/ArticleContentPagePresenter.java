@@ -60,13 +60,13 @@ public class ArticleContentPagePresenter {
             @Override
             public void run() {
                 // 将文章的作者、头像等信息保存到数据库
-                List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
+                ArticleEntity tmp = DbUtil.getArticleEntityDao()
                         .queryBuilder()
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
-                        .list();
+                        .unique();
                 // 此处先查询出同slug的对象，主要是为了使文章列表中的对象同步更新
-                ArticleEntity articleEntity = tmp.size() > 0 ?
-                        tmp.get(0) : new ArticleEntity();
+                ArticleEntity articleEntity = tmp == null?
+                        new ArticleEntity(): tmp;
                 articleEntity.copyFromArticleContent(articleContent);
                 // 将文章内容html保存到files/htmls/<slug>中
                 FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleEntity.getContent());

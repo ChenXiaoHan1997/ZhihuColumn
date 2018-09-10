@@ -35,10 +35,13 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
     private List<ArticleEntity> mArticleEntities;
     private Context mContext;
 
+    private LayoutInflater mLayoutInflater;
+
     public ArticleEntityAdapter(Context context, List<ArticleEntity> articleEntities) {
         this.mContext = context;
         this.mArticleEntities = articleEntities;
         this.mLoadState = LOADING_COMPLETE;
+        this.mLayoutInflater = LayoutInflater.from(mContext);
     }
 
 
@@ -55,10 +58,10 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_ITEM) {
-            View articleItemView = LayoutInflater.from(mContext).inflate(R.layout.item_article, parent, false);
+            View articleItemView = mLayoutInflater.inflate(R.layout.item_article, parent, false);
             return new ItemViewHolder(articleItemView);
         } else if (viewType == TYPE_FOOTER) {
-            View footerView = LayoutInflater.from(mContext).inflate(R.layout.layout_refresh_footer, parent, false);
+            View footerView = mLayoutInflater.inflate(R.layout.layout_refresh_footer, parent, false);
             return new FooterViewHolder(footerView);
         } else {
             return null;

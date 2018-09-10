@@ -45,8 +45,10 @@ public class HttpUtil {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        httpListener.onFail(String.format(sContext.getString(R.string.http_error),
-                                volleyError.networkResponse.statusCode));
+                        String detail = volleyError == null || volleyError.networkResponse == null?
+                                "": String.format(sContext.getString(R.string.http_error),
+                                volleyError.networkResponse.statusCode);
+                        httpListener.onFail(detail);
                     }
                 });
         sRequestQueue.add(request);
@@ -64,8 +66,10 @@ public class HttpUtil {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        httpListener.onFail(String.format(sContext.getString(R.string.http_error),
-                                volleyError.networkResponse.statusCode));
+                        String detail = volleyError == null || volleyError.networkResponse == null?
+                                "": String.format(sContext.getString(R.string.http_error),
+                                volleyError.networkResponse.statusCode);
+                        httpListener.onFail(detail);
                     }
                 });
         sRequestQueue.add(request);
