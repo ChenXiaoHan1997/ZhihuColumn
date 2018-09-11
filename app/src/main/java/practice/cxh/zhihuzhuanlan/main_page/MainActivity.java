@@ -12,6 +12,7 @@ import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +29,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initView();
         initData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        DbUtil.getColumnEntityDao().detachAll();
+        super.onDestroy();
     }
 
     private void initView() {

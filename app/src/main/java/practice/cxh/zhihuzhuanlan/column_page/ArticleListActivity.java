@@ -35,6 +35,7 @@ import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
 public class ArticleListActivity extends AppCompatActivity implements ArticleListV {
 
@@ -119,6 +120,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
+        DbUtil.getArticleEntityDao().detachAll();
         super.onDestroy();
     }
 
