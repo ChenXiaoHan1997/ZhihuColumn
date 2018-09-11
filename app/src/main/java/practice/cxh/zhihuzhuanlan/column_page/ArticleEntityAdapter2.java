@@ -1,6 +1,7 @@
 package practice.cxh.zhihuzhuanlan.column_page;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -36,13 +37,15 @@ public class ArticleEntityAdapter2 extends RecyclerView.Adapter<RecyclerView.Vie
 
     private AsyncDataSource<ArticleEntity> mDataSource;
     private Context mContext;
+    private RecyclerView mRecyclerView;
 
     private LayoutInflater mLayoutInflater;
 
-    public ArticleEntityAdapter2(Context context, AsyncDataSource dataSource) {
+    public ArticleEntityAdapter2(Context context, AsyncDataSource dataSource, RecyclerView recyclerView) {
         this.mContext = context;
         this.mDataSource = dataSource;
-        mLayoutInflater = LayoutInflater.from(mContext);
+        this.mRecyclerView = recyclerView;
+        this.mLayoutInflater = LayoutInflater.from(mContext);
     }
 
     @Override
@@ -65,14 +68,21 @@ public class ArticleEntityAdapter2 extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof ArticleEntityAdapter2.ItemViewHolder) {
-            final ArticleEntityAdapter2.ItemViewHolder itemViewHolder = (ArticleEntityAdapter2.ItemViewHolder) holder;
+            ArticleEntityAdapter2.ItemViewHolder itemViewHolder = (ArticleEntityAdapter2.ItemViewHolder) holder;
 //            final ArticleEntity articleEntity = mDataSource.getDataAt(position);
+            itemViewHolder.itemView.setTag(position);
             clearItemView(itemViewHolder);
             mDataSource.getDataAt(position, new ArticleDataListener() {
                 @Override
                 public void onDataLoaded(final ArticleEntity articleEntity) {
+                    // 慢速滑动时找不到itemView？？？
+                    View itemView = mRecyclerView.findViewWithTag(position);
+                    if (itemView == null) {
+                        return;
+                    }
+                    ItemViewHolder itemViewHolder = new ItemViewHolder(itemView);
                     switch (articleEntity.getDownloadState()) {
                         case ArticleEntity.DOWNLOAD_SUCCESS:
                             itemViewHolder.tvState.setText(mContext.getString(R.string.downloaded));
@@ -114,7 +124,7 @@ public class ArticleEntityAdapter2 extends RecyclerView.Adapter<RecyclerView.Vie
         holder.tvLikesCount.setText("");
         holder.tvDate.setText("");
         holder.tvState.setText("");
-        holder.ivPic.setImageDrawable(mContext.getResources().getDrawable((R.drawable.liukanshan)));
+        holder.ivPic.setImageResource(R.drawable.liukanshan);
     }
 
     @Override

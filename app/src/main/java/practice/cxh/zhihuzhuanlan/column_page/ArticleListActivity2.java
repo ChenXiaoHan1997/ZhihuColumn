@@ -104,7 +104,7 @@ public class ArticleListActivity2 extends AppCompatActivity {
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
         mDataSource = new ArticleEntityDataSource(mColumnEntity.getSlug(), mColumnEntity.getPostsCount());
-        mAdapter = new ArticleEntityAdapter2(this, mDataSource);
+        mAdapter = new ArticleEntityAdapter2(this, mDataSource, rvArticles);
         rvArticles.setAdapter(mAdapter);
     }
 
