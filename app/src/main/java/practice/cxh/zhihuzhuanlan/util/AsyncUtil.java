@@ -17,4 +17,8 @@ public class AsyncUtil {
         return sThreadPool;
     }
 
+    public static void executeAsync(Runnable runnable) {
+        sThreadPool.execute(runnable);
+    }
+
 }

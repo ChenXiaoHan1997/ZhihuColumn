@@ -35,6 +35,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
+        <activity android:name=".column_page.ArticleListActivity2"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
         <service android:name=".service.DownloadArticleContentService" />
     </application>
 

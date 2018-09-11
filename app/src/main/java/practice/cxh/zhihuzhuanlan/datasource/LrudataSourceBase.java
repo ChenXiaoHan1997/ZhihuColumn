@@ -1,6 +1,8 @@
-package practice.cxh.zhihuzhuanlan;
+package practice.cxh.zhihuzhuanlan.datasource;
 
 import android.util.LruCache;
+
+import java.util.List;
 
 public abstract class LrudataSourceBase<T> implements DataSource<T> {
 
@@ -22,8 +24,12 @@ public abstract class LrudataSourceBase<T> implements DataSource<T> {
         if (data != null) {
             return data;
         }
-        return getDataNoCached(position, 1);
+        return getDataNoCached(position, 1).get(0);
     }
 
-    public abstract T getDataNoCached(int start, int count);
+    protected abstract List<T> getDataNoCached(int start, int count);
+
+    protected void storeData(int position, T data) {
+        mCache.put(position, data);
+    }
 }
