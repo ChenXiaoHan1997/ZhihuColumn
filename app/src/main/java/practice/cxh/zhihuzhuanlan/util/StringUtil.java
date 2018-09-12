@@ -2,6 +2,11 @@ package practice.cxh.zhihuzhuanlan.util;
 
 import android.text.TextUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import practice.cxh.zhihuzhuanlan.bean.Author;
 import practice.cxh.zhihuzhuanlan.bean.Avatar;
 
@@ -67,5 +72,15 @@ public class StringUtil {
         }
         String picUrl = template.replace("{id}", picId).replace("{size}", size);
         return picUrl;
+    }
+
+    public static List<String> findAllRegexMatch(String source, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(source);
+        List<String> list = new ArrayList<>();
+        while (matcher.find()) {
+            list.add(matcher.group());
+        }
+        return list;
     }
 }
