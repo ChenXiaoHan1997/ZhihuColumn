@@ -18,6 +18,8 @@ import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 
 public class ArticleDownloadActivity extends AppCompatActivity {
 
+    // TODO RecyclerView 上拉加载更多
+
     private static final String ARTICLE_ENTITY_LIST = "article_entity_list";
 
     private Button btnDownloadAll;
@@ -49,6 +51,7 @@ public class ArticleDownloadActivity extends AppCompatActivity {
 
     private void initData() {
         mArticleEntityList = (List<ArticleEntity>) getIntent().getSerializableExtra(ARTICLE_ENTITY_LIST);
+        btnDownloadAll.setText(String.format(getString(R.string.download_all), mArticleEntityList.size()));
     }
 
     private View.OnClickListener mBtnClickListener = new View.OnClickListener() {
