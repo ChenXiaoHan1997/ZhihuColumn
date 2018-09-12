@@ -31,8 +31,11 @@ public class FileUtil {
     private static File sHtmlLocalPicDir;
     private static File sWebImgDir;
 
+    private static String sHtmlFileBase;
+
     public static void init(Application application) {
         sContext = application;
+        sHtmlFileBase = "file://" + sContext.getFilesDir().getAbsolutePath() + File.separator;
         sFilesDir = sContext.getFilesDir();
         sHtmlsDir = new File(sFilesDir, HTMLS_DIR);
         sHtmlLocalPicDir = new File(sFilesDir, HTMLS_LOCAL_PIC_DIR);
@@ -129,6 +132,10 @@ public class FileUtil {
     public static String getWebImageFilename(String url) {
         return url.replaceAll("https://", "")
                 .replace("/", "_");
+    }
+
+    public static String getHtmlFileBase() {
+        return sHtmlFileBase;
     }
 
     private static void makeDir(File dir) {

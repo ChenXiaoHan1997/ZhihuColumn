@@ -90,9 +90,11 @@ public class DownloadArticleContentService extends IntentService {
     private void downloadWebImages(String html) {
         List<String> imageUrls = HtmlUtil.getWebImages(html);
         for (final String url : imageUrls) {
+            Log.d("tag1", "try download image: " + url);
             HttpUtil.getBytes(url, new HttpUtil.HttpListener<byte[]>() {
                 @Override
                 public void onSuccess(byte[] data) {
+                    Log.d("tag1", "-----succeed in downloading: " + url);
                     String imageFileName = FileUtil.getWebImageFilename(url);
                     FileUtil.saveDataToFile(FileUtil.WEB_IMGAGES_DIR
                                     + File.separator + imageFileName, data);
