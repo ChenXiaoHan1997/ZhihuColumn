@@ -35,11 +35,11 @@ public class FileUtil {
 
     public static void init(Application application) {
         sContext = application;
-        sHtmlFileBase = "file://" + sContext.getFilesDir().getAbsolutePath() + File.separator;
         sFilesDir = sContext.getFilesDir();
         sHtmlsDir = new File(sFilesDir, HTMLS_DIR);
         sHtmlLocalPicDir = new File(sFilesDir, HTMLS_LOCAL_PIC_DIR);
         sWebImgDir = new File(sFilesDir, WEB_IMGAGES_DIR);
+        sHtmlFileBase = "file://" + sWebImgDir.getAbsolutePath() + File.separator;
         makeDir(sHtmlsDir);
         makeDir(sHtmlLocalPicDir);
         makeDir(sWebImgDir);
