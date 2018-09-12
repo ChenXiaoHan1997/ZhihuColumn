@@ -52,7 +52,7 @@ public class ArticleListActivity2 extends AppCompatActivity {
     private Toolbar toolbar;
 
     private ArticleEntityAdapter2 mAdapter;
-    private AsyncDataSource<ArticleEntity> mDataSource;
+    private DataSource<ArticleEntity> mDataSource;
 
 //    private ArticleEntityAdapter mAdapter;
 //    private List<ArticleEntity> mArticleEntityList = new ArrayList<>();
@@ -103,8 +103,11 @@ public class ArticleListActivity2 extends AppCompatActivity {
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
-        mDataSource = new ArticleEntityDataSource(mColumnEntity.getSlug(), mColumnEntity.getPostsCount());
-        mAdapter = new ArticleEntityAdapter2(this, mDataSource, rvArticles);
+        mAdapter = new ArticleEntityAdapter2(this, rvArticles);
+        mDataSource = new ArticleEntityDataSource(mColumnEntity.getSlug(),
+                mColumnEntity.getPostsCount(),
+                mAdapter);
+        mAdapter.setDataSource(mDataSource);
         rvArticles.setAdapter(mAdapter);
     }
 

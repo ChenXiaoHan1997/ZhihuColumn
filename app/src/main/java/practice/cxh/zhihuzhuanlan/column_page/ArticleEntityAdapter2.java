@@ -35,17 +35,21 @@ public class ArticleEntityAdapter2 extends RecyclerView.Adapter<RecyclerView.Vie
     private int mLoadState;
     private int mLastPosition;
 
-    private AsyncDataSource<ArticleEntity> mDataSource;
+    private DataSource<ArticleEntity> mDataSource;
     private Context mContext;
     private RecyclerView mRecyclerView;
 
     private LayoutInflater mLayoutInflater;
 
-    public ArticleEntityAdapter2(Context context, AsyncDataSource dataSource, RecyclerView recyclerView) {
+    public ArticleEntityAdapter2(Context context, RecyclerView recyclerView) {
         this.mContext = context;
-        this.mDataSource = dataSource;
+//        this.mDataSource = dataSource;
         this.mRecyclerView = recyclerView;
         this.mLayoutInflater = LayoutInflater.from(mContext);
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.mDataSource = dataSource;
     }
 
     @Override
@@ -69,51 +73,39 @@ public class ArticleEntityAdapter2 extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-        if (holder instanceof ArticleEntityAdapter2.ItemViewHolder) {
-            ArticleEntityAdapter2.ItemViewHolder itemViewHolder = (ArticleEntityAdapter2.ItemViewHolder) holder;
-//            final ArticleEntity articleEntity = mDataSource.getDataAt(position);
-            itemViewHolder.itemView.setTag(position);
-            clearItemView(itemViewHolder);
-            mDataSource.getDataAt(position, new ArticleDataListener() {
+        if (holder instanceof ItemViewHolder) {
+            ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
+            final ArticleEntity articleEntity = mDataSource.getDataAt(position);
+
+            switch (articleEntity.getDownloadState()) {
+                case ArticleEntity.DOWNLOAD_SUCCESS:
+                    itemViewHolder.tvState.setText(mContext.getString(R.string.downloaded));
+                    itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.limeGreen));
+                    break;
+                case ArticleEntity.DOWNLOADING:
+                    itemViewHolder.tvState.setText(mContext.getString(R.string.downloading));
+                    itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.shaddleBrown));
+                    break;
+                default:
+                    itemViewHolder.tvState.setText("");
+                    break;
+            }
+            if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
+                itemViewHolder.ivPic.setVisibility(View.GONE);
+            } else {
+                itemViewHolder.ivPic.setVisibility(View.VISIBLE);
+                Glide.with(mContext)
+                        .load(articleEntity.getTitleImage().replaceAll("_r", "_l"))
+                        .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
+                        .into(itemViewHolder.ivPic);
+            }
+            itemViewHolder.tvTitle.setText(articleEntity.getTitle());
+            itemViewHolder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
+            itemViewHolder.tvDate.setText(TimeUtil.convertPublishTime(articleEntity.getPublishedTime()));
+            itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onDataLoaded(final ArticleEntity articleEntity) {
-                    // 慢速滑动时找不到itemView？？？
-                    View itemView = mRecyclerView.findViewWithTag(position);
-                    if (itemView == null) {
-                        return;
-                    }
-                    ItemViewHolder itemViewHolder = new ItemViewHolder(itemView);
-                    switch (articleEntity.getDownloadState()) {
-                        case ArticleEntity.DOWNLOAD_SUCCESS:
-                            itemViewHolder.tvState.setText(mContext.getString(R.string.downloaded));
-                            itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.limeGreen));
-                            break;
-                        case ArticleEntity.DOWNLOADING:
-                            itemViewHolder.tvState.setText(mContext.getString(R.string.downloading));
-                            itemViewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.shaddleBrown));
-                            break;
-                        default:
-                            itemViewHolder.tvState.setText("");
-                            break;
-                    }
-                    if (TextUtils.isEmpty(articleEntity.getTitleImage())) {
-                        itemViewHolder.ivPic.setVisibility(View.GONE);
-                    } else {
-                        itemViewHolder.ivPic.setVisibility(View.VISIBLE);
-                        Glide.with(mContext)
-                                .load(articleEntity.getTitleImage().replaceAll("_r", "_l"))
-                                .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
-                                .into(itemViewHolder.ivPic);
-                    }
-                    itemViewHolder.tvTitle.setText(articleEntity.getTitle());
-                    itemViewHolder.tvLikesCount.setText(String.format(mContext.getString(R.string.likes_count), articleEntity.getLikesCount()));
-                    itemViewHolder.tvDate.setText(TimeUtil.convertPublishTime(articleEntity.getPublishedTime()));
-                    itemViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            ArticleContentActivity.launch((Activity) mContext, articleEntity);
-                        }
-                    });
+                public void onClick(View view) {
+                    ArticleContentActivity.launch((Activity) mContext, articleEntity);
                 }
             });
         }

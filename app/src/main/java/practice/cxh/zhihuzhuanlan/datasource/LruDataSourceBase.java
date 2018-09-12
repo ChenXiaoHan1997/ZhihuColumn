@@ -4,17 +4,17 @@ import android.util.LruCache;
 
 import java.util.List;
 
-public abstract class LrudataSourceBase<T> implements DataSource<T> {
+public abstract class LruDataSourceBase<T> implements DataSource<T> {
 
     private static final int DEFAULT_CACHE_SIZE = 50;
 
-    private LruCache<Integer, T> mCache;
+    protected LruCache<Integer, T> mCache;
 
-    public LrudataSourceBase() {
+    public LruDataSourceBase() {
         this(DEFAULT_CACHE_SIZE);
     }
 
-    public LrudataSourceBase(int cacheSize) {
+    public LruDataSourceBase(int cacheSize) {
         mCache = new LruCache<>(cacheSize);
     }
 
