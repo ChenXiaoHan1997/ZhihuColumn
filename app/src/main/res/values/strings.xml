@@ -9,7 +9,7 @@
     <string name="loading">正在加载...</string>
     <string name="no_more">没有更多啦</string>
     <string name="action_download">批量下载</string>
-    <string name="download_all">下载全部</string>
+    <string name="download_all">下载全部（ %d 篇）</string>
     <string name="author_and_time">%s，%s</string>
     <string name="fail_retry">加载失败，点击重试</string>
     <string name="http_error">错误：%d</string>
