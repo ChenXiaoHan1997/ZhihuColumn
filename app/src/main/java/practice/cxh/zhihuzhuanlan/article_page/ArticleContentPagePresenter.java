@@ -38,26 +38,36 @@ public class ArticleContentPagePresenter {
         loadArticleContentLocal(articleSlug);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
                 new HttpUtil.HttpListener<String>() {
-            @Override
-            public void onSuccess(String response) {
-                mLoadedFromNet = true;
-                // TODO 解码等操作放到子线程
-                ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
-                ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
-                notifyArticleListPage(articleSlug, true);
-                mActivity.onArticleContentLoaded(articleEntity);
-                saveArticleContent(articleContent);
-                // 后台下载图片
-                DownloadArticleContentService.downloadWebImages(mActivity, articleContent.getContent());
-            }
+                    @Override
+                    public void onSuccess(final String response) {
+                        mLoadedFromNet = true;
+                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
+                                final ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
+                                notifyArticleListPage(articleSlug, true);
+                                mUiHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mActivity.onArticleContentLoaded(articleEntity);
+                                    }
+                                });
+                                saveArticleContent(articleContent);
+                                // 后台下载图片
+                                DownloadArticleContentService.downloadWebImages(mActivity, articleContent.getContent());
+                            }
+                        });
 
-            @Override
-            public void onFail(String detail) {
-                if (!mLoadedFromLocal && !mLoadedFromNet) {
-                    mActivity.onArticleContentLoadFail();
-                }
-            }
-        });
+                    }
+
+                    @Override
+                    public void onFail(String detail) {
+                        if (!mLoadedFromLocal && !mLoadedFromNet) {
+                            mActivity.onArticleContentLoadFail();
+                        }
+                    }
+                });
     }
 
     private void saveArticleContent(final ArticleContent articleContent) {
@@ -70,8 +80,8 @@ public class ArticleContentPagePresenter {
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
                         .unique();
                 // 此处先查询出同slug的对象，主要是为了使文章列表中的对象同步更新
-                ArticleEntity articleEntity = tmp == null?
-                        new ArticleEntity(): tmp;
+                ArticleEntity articleEntity = tmp == null ?
+                        new ArticleEntity() : tmp;
                 articleEntity.copyFromArticleContent(articleContent);
                 // 将文章内容html保存到files/htmls/<slug>中
                 FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(),
