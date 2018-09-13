@@ -33,6 +33,7 @@ public class MainpagePresenter {
                     new HttpUtil.HttpListener<String>() {
                 @Override
                 public void onSuccess(String response) {
+                    // TODO 解码等操作放到子线程
                     Column column = JsonUtil.decodeColumn(response);
                     ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
                     // 显示在UI
