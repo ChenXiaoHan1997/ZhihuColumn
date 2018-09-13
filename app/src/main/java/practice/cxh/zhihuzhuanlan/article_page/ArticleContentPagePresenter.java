@@ -12,9 +12,11 @@ import practice.cxh.zhihuzhuanlan.Constants;
 import practice.cxh.zhihuzhuanlan.bean.ArticleContent;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
+import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.FileUtil;
+import practice.cxh.zhihuzhuanlan.util.HtmlUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
@@ -36,23 +38,36 @@ public class ArticleContentPagePresenter {
         loadArticleContentLocal(articleSlug);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
                 new HttpUtil.HttpListener<String>() {
-            @Override
-            public void onSuccess(String response) {
-                mLoadedFromNet = true;
-                ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
-                ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
-                notifyArticleListPage(articleSlug, true);
-                mActivity.onArticleContentLoaded(articleEntity);
-                saveArticleContent(articleContent);
-            }
+                    @Override
+                    public void onSuccess(final String response) {
+                        mLoadedFromNet = true;
+                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
+                                final ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
+                                notifyArticleListPage(articleSlug, true);
+                                mUiHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mActivity.onArticleContentLoaded(articleEntity);
+                                    }
+                                });
+                                saveArticleContent(articleContent);
+                                // 后台下载图片
+                                DownloadArticleContentService.downloadWebImages(mActivity, articleContent.getContent());
+                            }
+                        });
 
-            @Override
-            public void onFail(String detail) {
-                if (!mLoadedFromLocal && !mLoadedFromNet) {
-                    mActivity.onArticleContentLoadFail();
-                }
-            }
-        });
+                    }
+
+                    @Override
+                    public void onFail(String detail) {
+                        if (!mLoadedFromLocal && !mLoadedFromNet) {
+                            mActivity.onArticleContentLoadFail();
+                        }
+                    }
+                });
     }
 
     private void saveArticleContent(final ArticleContent articleContent) {
@@ -65,11 +80,15 @@ public class ArticleContentPagePresenter {
                         .where(ArticleEntityDao.Properties.Slug.eq(articleContent.getSlug()))
                         .unique();
                 // 此处先查询出同slug的对象，主要是为了使文章列表中的对象同步更新
-                ArticleEntity articleEntity = tmp == null?
-                        new ArticleEntity(): tmp;
+                ArticleEntity articleEntity = tmp == null ?
+                        new ArticleEntity() : tmp;
                 articleEntity.copyFromArticleContent(articleContent);
                 // 将文章内容html保存到files/htmls/<slug>中
-                FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(), articleEntity.getContent());
+                FileUtil.saveTextToFile(FileUtil.HTMLS_DIR + File.separator + articleContent.getSlug(),
+                        articleEntity.getContent());
+                // 将替换过图片地址的文章内容html保存到files/htmls_local_pic/<slug>中
+                FileUtil.saveTextToFile(FileUtil.HTMLS_LOCAL_PIC_DIR + File.separator + articleContent.getSlug(),
+                        HtmlUtil.replaceWebImgSrc(articleEntity.getContent()));
                 DbUtil.getArticleEntityDao().update(articleEntity);
             }
         });
@@ -85,7 +104,7 @@ public class ArticleContentPagePresenter {
                         .list();
                 if (articleEntityList.size() > 0) {
                     final ArticleEntity articleEntity = articleEntityList.get(0);
-                    String content = FileUtil.readTextFromFile(FileUtil.HTMLS_DIR + File.separator + articleSlug);
+                    String content = FileUtil.readTextFromFile(FileUtil.HTMLS_LOCAL_PIC_DIR + File.separator + articleSlug);
                     if (TextUtils.isEmpty(content)) {
                         return;
                     }

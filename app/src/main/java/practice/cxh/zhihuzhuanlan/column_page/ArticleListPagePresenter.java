@@ -18,8 +18,7 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class ArticleListPagePresenter {
 
-    private static final int ARTICLE_LIMIT = 10;
-    private static final int FIRST_LOAD_LIMIT = 30;
+
 
     private ArticleListV mArticleListV;
     private Handler mUiHandler;
@@ -29,31 +28,42 @@ public class ArticleListPagePresenter {
         mUiHandler = new Handler();
     }
 
-    public void loadArticleList(final String columnSlug, final int offset) {
+    public void loadArticleList(final String columnSlug, final int offset, int limit) {
         // TODO 先从数据库加载
+        loadArticleListFromDB(columnSlug, offset, limit, false);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
                         + "/" + HttpUtil.POSTS + "?offset=" + offset
-                        + "&limit=" + FIRST_LOAD_LIMIT,
+                        + "&limit=" + limit,
                 new HttpUtil.HttpListener<String>() {
                     @Override
-                    public void onSuccess(String response) {
-                        List<Article> articlesList = JsonUtil.decodeArticleList(response);
-                        List<ArticleEntity> articleEntityList = new ArrayList<ArticleEntity>();
-                        for (Article article : articlesList) {
-                            // articleEntity是新获得的
-                            ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article, columnSlug);
-                            // 若数据库中已有此文章，设置articleEntity的下载状态
-                            List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
-                                    .queryBuilder()
-                                    .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
-                                    .list();
-                            if (tmp.size() > 0) {
-                                articleEntity.setDownloadState(tmp.get(0).getDownloadState());
+                    public void onSuccess(final String response) {
+                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Article> articlesList = JsonUtil.decodeArticleList(response);
+                                final List<ArticleEntity> articleEntityList = new ArrayList<ArticleEntity>();
+                                for (Article article : articlesList) {
+                                    // articleEntity是新获得的
+                                    ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article, columnSlug);
+                                    // 若数据库中已有此文章，设置articleEntity的下载状态
+                                    List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
+                                            .queryBuilder()
+                                            .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
+                                            .list();
+                                    if (tmp.size() > 0) {
+                                        articleEntity.setDownloadState(tmp.get(0).getDownloadState());
+                                    }
+                                    articleEntityList.add(articleEntity);
+                                }
+                                mUiHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mArticleListV.onArticleListLoaded(articleEntityList, offset);
+                                    }
+                                });
+                                saveArticleList(articleEntityList);
                             }
-                            articleEntityList.add(articleEntity);
-                        }
-                        mArticleListV.onArticleListLoaded(articleEntityList, false);
-                        saveArticleList(articleEntityList);
+                        });
                     }
 
                     @Override

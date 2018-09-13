@@ -17,7 +17,7 @@ public class MainpagePresenter {
     private MainActivity mActivity;
     private Handler mUiHandler;
 
-    private String[] columnsSlugs = new String[] {"zhaohaoyang", "542b2333", "maqianzu", "diqiuzhishiju", "c_134408063", "h4cj250", "baitouwengkezhan", "stormzhang", "huizi", "kaede", "zhangjiawei", "hehehe"};
+    private String[] columnsSlugs = new String[]{"zhaohaoyang", "542b2333", "maqianzu", "diqiuzhishiju", "c_134408063", "h4cj250", "baitouwengkezhan", "stormzhang", "huizi", "kaede", "zhangjiawei", "hehehe"};
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
@@ -31,22 +31,32 @@ public class MainpagePresenter {
         for (final String columnSlug : columnsSlugs) {
             HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
                     new HttpUtil.HttpListener<String>() {
-                @Override
-                public void onSuccess(String response) {
-                    Column column = JsonUtil.decodeColumn(response);
-                    ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
-                    // 显示在UI
-                    mActivity.onColumnLoaded(columnEntity);
-                    // 保存到数据库
-                    saveColumnEntity(columnEntity);
-                }
+                        @Override
+                        public void onSuccess(final String response) {
+                            AsyncUtil.getThreadPool().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Column column = JsonUtil.decodeColumn(response);
+                                    final ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
+                                    mUiHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // 显示在UI
+                                            mActivity.onColumnLoaded(columnEntity);
+                                        }
+                                    });
+                                    // 保存到数据库
+                                    saveColumnEntity(columnEntity);
+                                }
+                            });
+                        }
 
-                @Override
-                public void onFail(String detail) {
-                    // 加载失败，读取本地数据
-                    loadColumnEntityFromDB(columnSlug);
-                }
-            });
+                        @Override
+                        public void onFail(String detail) {
+                            // 加载失败，读取本地数据
+                            loadColumnEntityFromDB(columnSlug);
+                        }
+                    });
         }
     }
 
