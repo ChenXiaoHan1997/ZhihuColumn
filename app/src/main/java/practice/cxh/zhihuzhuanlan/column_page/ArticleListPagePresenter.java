@@ -18,8 +18,7 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class ArticleListPagePresenter {
 
-    private static final int ARTICLE_LIMIT = 10;
-    private static final int FIRST_LOAD_LIMIT = 30;
+
 
     private ArticleListV mArticleListV;
     private Handler mUiHandler;
@@ -29,11 +28,12 @@ public class ArticleListPagePresenter {
         mUiHandler = new Handler();
     }
 
-    public void loadArticleList(final String columnSlug, final int offset) {
+    public void loadArticleList(final String columnSlug, final int offset, int limit) {
         // TODO 先从数据库加载
+        loadArticleListFromDB(columnSlug, offset, limit, false);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
                         + "/" + HttpUtil.POSTS + "?offset=" + offset
-                        + "&limit=" + FIRST_LOAD_LIMIT,
+                        + "&limit=" + limit,
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {

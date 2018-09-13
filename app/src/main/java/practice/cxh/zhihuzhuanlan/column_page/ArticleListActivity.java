@@ -34,13 +34,15 @@ import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
-import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
 public class ArticleListActivity extends AppCompatActivity implements ArticleListV {
 
     public static String COLUMN_ENTITY = "column_entity";
+
+    private static final int LOAD_LIMIT = 10;
+    private static final int FIRST_LOAD_LIMIT = 30;
 
     private ColumnEntity mColumnEntity;
 
@@ -113,7 +115,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);
-        mPresenter.loadArticleList(mColumnEntity.getSlug(), 0);
+        mPresenter.loadArticleList(mColumnEntity.getSlug(), 0, FIRST_LOAD_LIMIT);
     }
 
     @Override
@@ -171,6 +173,17 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         mAdapter.notifyItemRangeChanged(oldSize, mArticleEntityList.size() - oldSize);
     }
 
+    @Override
+    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, int offset) {
+        int count = Math.min(articleEntityList.size(), mArticleEntityList.size() - offset);
+        for (int i = 0; i < count; i++) {
+            mArticleEntityList.remove(offset);
+        }
+        mArticleEntityList.addAll(offset, articleEntityList);
+        mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
+        mAdapter.notifyItemRangeChanged(offset, count);
+    }
+
     private void refreshArticleList() {
         // TODO 重新加载
         AsyncUtil.getThreadPool().execute(new Runnable() {
@@ -207,7 +220,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         public void onLoadMore() {
             mAdapter.setLoadState(ArticleEntityAdapter.LOADING);
             if (mArticleEntityList.size() < mColumnEntity.getPostsCount()) {
-                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size());
+                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size(), LOAD_LIMIT);
             } else {
                 mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
             }
