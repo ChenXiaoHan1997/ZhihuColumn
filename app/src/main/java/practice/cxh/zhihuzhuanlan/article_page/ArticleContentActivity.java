@@ -17,6 +17,7 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
@@ -32,6 +33,7 @@ import java.util.Scanner;
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
+import practice.cxh.zhihuzhuanlan.util.FileUtil;
 import practice.cxh.zhihuzhuanlan.util.HtmlUtil;
 import practice.cxh.zhihuzhuanlan.util.StringUtil;
 import practice.cxh.zhihuzhuanlan.util.TimeUtil;
@@ -81,6 +83,8 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     private void initView() {
         setContentView(R.layout.activity_article_content);
+        // 去掉DecorView背景
+        getWindow().setBackgroundDrawable(null);
         mAppBar = findViewById(R.id.app_bar);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         ivTitleImage = findViewById(R.id.iv_title_image);
@@ -103,7 +107,11 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     private void initWebView() {
         wvContent.addJavascriptInterface(this, JS_INTERFACE);
-        wvContent.getSettings().setJavaScriptEnabled(true);
+        WebSettings webSettings = wvContent.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAllowFileAccessFromFileURLs(true);
     }
 
     @Override
@@ -146,8 +154,9 @@ public class ArticleContentActivity extends AppCompatActivity {
         tvFailRetry.setVisibility(View.GONE);
         tvFailRetry.setOnClickListener(null);
         wvContent.setVisibility(View.VISIBLE);
-        wvContent.loadData(articleEntity.getContent(),"text/html; charset=UTF-8", null);
-        }
+//        wvContent.loadData(articleEntity.getContent(),"text/html; charset=UTF-8", null);
+        wvContent.loadDataWithBaseURL(FileUtil.getHtmlFileBase(), articleEntity.getContent(), "text/html; charset=UTF-8", null, null);
+    }
 
     public void onArticleContentLoadFail() {
         wvContent.setVisibility(View.GONE);

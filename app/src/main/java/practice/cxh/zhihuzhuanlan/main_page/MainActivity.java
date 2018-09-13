@@ -12,6 +12,7 @@ import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,8 +31,16 @@ public class MainActivity extends AppCompatActivity {
         initData();
     }
 
+    @Override
+    protected void onDestroy() {
+        DbUtil.getColumnEntityDao().detachAll();
+        super.onDestroy();
+    }
+
     private void initView() {
         setContentView(R.layout.activity_main);
+        // 去掉DecorView背景
+        getWindow().setBackgroundDrawable(null);
         toolbar = (Toolbar) findViewById(R.id.tb_main);
         setSupportActionBar(toolbar);
         rvColumns = (RecyclerView) findViewById(R.id.rv_columns);

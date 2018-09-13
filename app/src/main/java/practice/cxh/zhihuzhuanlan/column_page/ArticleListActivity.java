@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,12 +34,15 @@ import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
-import practice.cxh.zhihuzhuanlan.service.DownloadArticleContentService;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
 public class ArticleListActivity extends AppCompatActivity implements ArticleListV {
 
     public static String COLUMN_ENTITY = "column_entity";
+
+    private static final int LOAD_LIMIT = 10;
+    private static final int FIRST_LOAD_LIMIT = 30;
 
     private ColumnEntity mColumnEntity;
 
@@ -74,6 +78,8 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     private void initView() {
         setContentView(R.layout.activity_article_list);
+        // 去掉DecorView背景
+        getWindow().setBackgroundDrawable(null);
         mAppBar = findViewById(R.id.app_bar);
         mHeader = findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
@@ -83,6 +89,8 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         swipeRefresh = findViewById(R.id.swipe_refresh);
         rvArticles = findViewById(R.id.rv_articles);
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
+        // 取消动画避免列表项闪烁
+        ((SimpleItemAnimator)rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
         mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
         rvArticles.setAdapter(mAdapter);
     }
@@ -107,7 +115,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);
-        mPresenter.loadArticleList(mColumnEntity.getSlug(), 0);
+        mPresenter.loadArticleList(mColumnEntity.getSlug(), 0, FIRST_LOAD_LIMIT);
     }
 
     @Override
@@ -119,6 +127,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
+        DbUtil.getArticleEntityDao().detachAll();
         super.onDestroy();
     }
 
@@ -164,6 +173,17 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         mAdapter.notifyItemRangeChanged(oldSize, mArticleEntityList.size() - oldSize);
     }
 
+    @Override
+    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, int offset) {
+        int count = Math.min(articleEntityList.size(), mArticleEntityList.size() - offset);
+        for (int i = 0; i < count; i++) {
+            mArticleEntityList.remove(offset);
+        }
+        mArticleEntityList.addAll(offset, articleEntityList);
+        mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
+        mAdapter.notifyItemRangeChanged(offset, count);
+    }
+
     private void refreshArticleList() {
         // TODO 重新加载
         AsyncUtil.getThreadPool().execute(new Runnable() {
@@ -200,7 +220,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         public void onLoadMore() {
             mAdapter.setLoadState(ArticleEntityAdapter.LOADING);
             if (mArticleEntityList.size() < mColumnEntity.getPostsCount()) {
-                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size());
+                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size(), LOAD_LIMIT);
             } else {
                 mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
             }

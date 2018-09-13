@@ -21,19 +21,28 @@ import java.util.Scanner;
 
 public class FileUtil {
 
-    public static String HTMLS_DIR = "htmls";
+    public static final String HTMLS_DIR = "htmls";
+    public static final String HTMLS_LOCAL_PIC_DIR = "htmls_local_pic";
+    public static final String WEB_IMGAGES_DIR = "web_images";
 
     private static Context sContext;
     private static File sFilesDir;
     private static File sHtmlsDir;
+    private static File sHtmlLocalPicDir;
+    private static File sWebImgDir;
+
+    private static String sHtmlFileBase;
 
     public static void init(Application application) {
         sContext = application;
         sFilesDir = sContext.getFilesDir();
         sHtmlsDir = new File(sFilesDir, HTMLS_DIR);
-        if (!sHtmlsDir.exists()) {
-            sHtmlsDir.mkdirs();
-        }
+        sHtmlLocalPicDir = new File(sFilesDir, HTMLS_LOCAL_PIC_DIR);
+        sWebImgDir = new File(sFilesDir, WEB_IMGAGES_DIR);
+        sHtmlFileBase = "file://" + sWebImgDir.getAbsolutePath() + File.separator;
+        makeDir(sHtmlsDir);
+        makeDir(sHtmlLocalPicDir);
+        makeDir(sWebImgDir);
     }
 
     public static String readTextFromAssets(String relativePath) {
@@ -96,6 +105,42 @@ public class FileUtil {
                     Log.e("cxh", "", e);
                 }
             }
+        }
+    }
+
+    public static boolean saveDataToFile(String relativePath, byte[] data) {
+        String absolutePath = sFilesDir.getAbsolutePath() + File.separator + relativePath;
+        FileOutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(absolutePath);
+            outputStream.write(data);
+            outputStream.flush();
+            return true;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                Log.e("cxh", "", e);
+            }
+        }
+    }
+
+    public static String getWebImageFilename(String url) {
+        return url.replaceAll("https://", "")
+                .replace("/", "_");
+    }
+
+    public static String getHtmlFileBase() {
+        return sHtmlFileBase;
+    }
+
+    private static void makeDir(File dir) {
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
     }
 }
