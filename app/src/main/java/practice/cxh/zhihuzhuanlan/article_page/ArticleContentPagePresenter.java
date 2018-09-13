@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.article_page;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -30,7 +31,7 @@ public class ArticleContentPagePresenter {
 
     public ArticleContentPagePresenter(ArticleContentActivity activity) {
         this.mActivity = activity;
-        mUiHandler = new Handler(mActivity.getMainLooper());
+        mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     public void loadArticleContent(final String articleSlug) {
@@ -62,7 +63,7 @@ public class ArticleContentPagePresenter {
                     }
 
                     @Override
-                    public void onFail(String detail) {
+                    public void onFail(String statusCode) {
                         if (!mLoadedFromLocal && !mLoadedFromNet) {
                             mActivity.onArticleContentLoadFail();
                         }

@@ -15,4 +15,6 @@
     <string name="http_error">错误：%d</string>
     <string name="more">更多</string>
     <string name="search_column">搜索专栏</string>
+    <string name="input_slug">请输入专栏slug</string>
+    <string name="go_search">查看slug为「%s」的搜索结果</string>
 </resources>

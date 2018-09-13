@@ -7,17 +7,36 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.R;
+import practice.cxh.zhihuzhuanlan.bean.Column;
+import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.main_page.ColumnEntityAdapter;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements SearchV {
 
-    private Toolbar toolbar;
+    private SearchPagePresenter mPresenter;
+
+    private TextView tvGo;
     private SearchView searchView;
+    private RecyclerView rvColumns;
+    private Toolbar toolbar;
+
+    private ColumnEntityAdapter mAdapter;
+    private List<ColumnEntity> mColumnEntityList = new ArrayList<>();
 
     public static void launch(Activity activity) {
         Intent intent = new Intent(activity, SearchActivity.class);
@@ -29,10 +48,16 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initView();
         initToolbar();
+        initData();
     }
 
     private void initView() {
         setContentView(R.layout.activity_search);
+        tvGo = findViewById(R.id.tv_go);
+        rvColumns = findViewById(R.id.rv_columns);
+        rvColumns.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter = new ColumnEntityAdapter(this, mColumnEntityList);
+        rvColumns.setAdapter(mAdapter);
     }
 
     private void initToolbar() {
@@ -46,6 +71,10 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    private void initData() {
+        mPresenter = new SearchPagePresenter(this);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_page, menu);
@@ -53,6 +82,52 @@ public class SearchActivity extends AppCompatActivity {
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setIconified(false);
         searchView.onActionViewExpanded();
+        searchView.setQueryHint(getString(R.string.input_slug));
+        searchView.setOnQueryTextListener(mQueryTextListener);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onColumnFound(ColumnEntity columnEntity) {
+        mColumnEntityList.clear();
+        rvColumns.setVisibility(View.VISIBLE);
+        tvGo.setVisibility(View.GONE);
+        mColumnEntityList.add(columnEntity);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onColumnNotFound() {
+
+    }
+
+    private SearchView.OnQueryTextListener mQueryTextListener = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            mPresenter.searchColumn(query);
+            return true;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            rvColumns.setVisibility(View.GONE);
+            if (!TextUtils.isEmpty(newText)) {
+                tvGo.setVisibility(View.VISIBLE);
+                tvGo.setText(String.format(getString(R.string.go_search), newText));
+            } else {
+                tvGo.setVisibility(View.GONE);
+            }
+            return true;
+        }
+    };
 }

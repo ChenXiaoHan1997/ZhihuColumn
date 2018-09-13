@@ -45,7 +45,7 @@ public class ColumnEntity implements Serializable {
         ColumnEntity columnEntity = new ColumnEntity();
         columnEntity.slug = column.getSlug();
         columnEntity.name = column.getName();
-        columnEntity.avatar = StringUtil.getAvatarUrl(column.getAvatar(), "m");
+        columnEntity.avatar = StringUtil.getAvatarUrl(column.getAvatar(), "l");
         columnEntity.description = column.getDescription();
         columnEntity.followersCount = column.getFollowersCount();
         columnEntity.postsCount = column.getPostsCount();

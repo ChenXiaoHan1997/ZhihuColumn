@@ -1,6 +1,7 @@
 package practice.cxh.zhihuzhuanlan.main_page;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class MainpagePresenter {
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
-        mUiHandler = new Handler(mActivity.getMainLooper());
+        mUiHandler = new Handler(Looper.getMainLooper());
         init();
     }
 
@@ -62,7 +63,7 @@ public class MainpagePresenter {
                         }
 
                         @Override
-                        public void onFail(String detail) {
+                        public void onFail(String statusCode) {
                             // 加载失败，读取本地数据
                             loadColumnEntityFromDB(columnSlug);
                         }
