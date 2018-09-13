@@ -36,25 +36,34 @@ public class ArticleListPagePresenter {
                         + "&limit=" + FIRST_LOAD_LIMIT,
                 new HttpUtil.HttpListener<String>() {
                     @Override
-                    public void onSuccess(String response) {
-                        // TODO 解码等操作放到子线程
-                        List<Article> articlesList = JsonUtil.decodeArticleList(response);
-                        List<ArticleEntity> articleEntityList = new ArrayList<ArticleEntity>();
-                        for (Article article : articlesList) {
-                            // articleEntity是新获得的
-                            ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article, columnSlug);
-                            // 若数据库中已有此文章，设置articleEntity的下载状态
-                            List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
-                                    .queryBuilder()
-                                    .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
-                                    .list();
-                            if (tmp.size() > 0) {
-                                articleEntity.setDownloadState(tmp.get(0).getDownloadState());
+                    public void onSuccess(final String response) {
+                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                List<Article> articlesList = JsonUtil.decodeArticleList(response);
+                                final List<ArticleEntity> articleEntityList = new ArrayList<ArticleEntity>();
+                                for (Article article : articlesList) {
+                                    // articleEntity是新获得的
+                                    ArticleEntity articleEntity = ArticleEntity.convertFromArticle(article, columnSlug);
+                                    // 若数据库中已有此文章，设置articleEntity的下载状态
+                                    List<ArticleEntity> tmp = DbUtil.getArticleEntityDao()
+                                            .queryBuilder()
+                                            .where(ArticleEntityDao.Properties.Slug.eq(articleEntity.getSlug()))
+                                            .list();
+                                    if (tmp.size() > 0) {
+                                        articleEntity.setDownloadState(tmp.get(0).getDownloadState());
+                                    }
+                                    articleEntityList.add(articleEntity);
+                                }
+                                mUiHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mArticleListV.onArticleListLoaded(articleEntityList, false);
+                                    }
+                                });
+                                saveArticleList(articleEntityList);
                             }
-                            articleEntityList.add(articleEntity);
-                        }
-                        mArticleListV.onArticleListLoaded(articleEntityList, false);
-                        saveArticleList(articleEntityList);
+                        });
                     }
 
                     @Override
