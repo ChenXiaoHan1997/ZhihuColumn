@@ -75,6 +75,8 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     private void initView() {
         setContentView(R.layout.activity_article_list);
+        // 去掉DecorView背景
+        getWindow().setBackgroundDrawable(null);
         mAppBar = findViewById(R.id.app_bar);
         mHeader = findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);

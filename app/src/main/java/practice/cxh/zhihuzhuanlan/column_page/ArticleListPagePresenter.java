@@ -37,6 +37,7 @@ public class ArticleListPagePresenter {
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(String response) {
+                        // TODO 解码等操作放到子线程
                         List<Article> articlesList = JsonUtil.decodeArticleList(response);
                         List<ArticleEntity> articleEntityList = new ArrayList<ArticleEntity>();
                         for (Article article : articlesList) {

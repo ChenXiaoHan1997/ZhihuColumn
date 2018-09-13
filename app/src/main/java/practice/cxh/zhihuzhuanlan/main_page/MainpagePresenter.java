@@ -17,7 +17,7 @@ public class MainpagePresenter {
     private MainActivity mActivity;
     private Handler mUiHandler;
 
-    private String[] columnsSlugs = new String[] {"zhaohaoyang", "542b2333", "qiechihe", "c_134408063", "h4cj250", "huizi", "kaede", "zhangjiawei"};
+    private String[] columnsSlugs = new String[] {"zhaohaoyang", "542b2333", "maqianzu", "diqiuzhishiju", "c_134408063", "h4cj250", "baitouwengkezhan", "stormzhang", "huizi", "kaede", "zhangjiawei", "hehehe"};
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
@@ -33,6 +33,7 @@ public class MainpagePresenter {
                     new HttpUtil.HttpListener<String>() {
                 @Override
                 public void onSuccess(String response) {
+                    // TODO 解码等操作放到子线程
                     Column column = JsonUtil.decodeColumn(response);
                     ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
                     // 显示在UI
