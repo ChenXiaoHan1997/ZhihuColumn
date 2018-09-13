@@ -31,6 +31,7 @@ public class ArticleListPagePresenter {
     public void loadArticleList(final String columnSlug, final int offset, int limit) {
         // TODO 先从数据库加载
         loadArticleListFromDB(columnSlug, offset, limit, false);
+        mArticleListV.showLoading(true);
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
                         + "/" + HttpUtil.POSTS + "?offset=" + offset
                         + "&limit=" + limit,
@@ -58,6 +59,7 @@ public class ArticleListPagePresenter {
                                 mUiHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        mArticleListV.showLoading(false);
                                         mArticleListV.onArticleListLoaded(articleEntityList, offset);
                                     }
                                 });
@@ -68,6 +70,7 @@ public class ArticleListPagePresenter {
 
                     @Override
                     public void onFail(String detail) {
+                        mArticleListV.showLoading(false);
                         loadArticleListFromDB(columnSlug);
                     }
                 });

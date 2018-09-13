@@ -116,7 +116,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);
         mPresenter.loadArticleList(mColumnEntity.getSlug(), 0, FIRST_LOAD_LIMIT);
-        swipeRefresh.setRefreshing(true);
+//        swipeRefresh.setRefreshing(true);
     }
 
     @Override
@@ -165,7 +165,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     @Override
     public void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld) {
-        swipeRefresh.setRefreshing(false);
+//        swipeRefresh.setRefreshing(false);
         if (clearOld) {
             mArticleEntityList.clear();
         }
@@ -204,6 +204,11 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 });
             }
         });
+    }
+
+    @Override
+    public void showLoading(boolean loading) {
+        swipeRefresh.setRefreshing(loading);
     }
 
     private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
