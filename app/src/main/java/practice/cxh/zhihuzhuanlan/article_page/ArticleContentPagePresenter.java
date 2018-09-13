@@ -39,6 +39,7 @@ public class ArticleContentPagePresenter {
             @Override
             public void onSuccess(String response) {
                 mLoadedFromNet = true;
+                // TODO 解码等操作放到子线程
                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
                 ArticleEntity articleEntity = ArticleEntity.convertFromArticleContent(articleContent);
                 notifyArticleListPage(articleSlug, true);

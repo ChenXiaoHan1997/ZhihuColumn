@@ -81,6 +81,8 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     private void initView() {
         setContentView(R.layout.activity_article_content);
+        // 去掉DecorView背景
+        getWindow().setBackgroundDrawable(null);
         mAppBar = findViewById(R.id.app_bar);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         ivTitleImage = findViewById(R.id.iv_title_image);
