@@ -51,7 +51,8 @@ public class FileUtil {
             Scanner scanner = new Scanner(manager.open(relativePath));
             StringBuilder builder = new StringBuilder();
             while (scanner.hasNext()) {
-                builder.append(scanner.nextLine());
+                builder.append(scanner.nextLine())
+                        .append("\n");
             }
             return builder.toString();
         } catch (IOException e) {

@@ -10,6 +10,7 @@ import practice.cxh.zhihuzhuanlan.db.ColumnEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
+import practice.cxh.zhihuzhuanlan.util.FileUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
@@ -17,17 +18,26 @@ public class MainpagePresenter {
     private MainActivity mActivity;
     private Handler mUiHandler;
 
-    private String[] columnsSlugs = new String[]{"zhaohaoyang", "542b2333", "maqianzu", "diqiuzhishiju", "c_134408063", "h4cj250", "baitouwengkezhan", "stormzhang", "huizi", "kaede", "zhangjiawei", "hehehe"};
+    private String[] columnsSlugs;
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
         mUiHandler = new Handler(mActivity.getMainLooper());
+        init();
+    }
+
+    private void init() {
+        String followings = FileUtil.readTextFromAssets("following.txt");
+        columnsSlugs = followings.split("\n");
     }
 
     /**
      * 加载所有关注的专栏
      */
     public void loadColums() {
+        if (columnsSlugs == null) {
+            return;
+        }
         for (final String columnSlug : columnsSlugs) {
             HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
                     new HttpUtil.HttpListener<String>() {
