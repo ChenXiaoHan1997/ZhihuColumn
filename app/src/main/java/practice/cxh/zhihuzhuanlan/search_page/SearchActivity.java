@@ -48,6 +48,7 @@ public class SearchActivity extends AppCompatActivity implements SearchV {
         super.onCreate(savedInstanceState);
         initView();
         initToolbar();
+        registerListener();
         initData();
     }
 
@@ -69,6 +70,9 @@ public class SearchActivity extends AppCompatActivity implements SearchV {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_arrow_back_ios_white);
         }
+    }
+    private void registerListener() {
+        tvGo.setOnClickListener(mOnClickListener);
     }
 
     private void initData() {
@@ -128,6 +132,14 @@ public class SearchActivity extends AppCompatActivity implements SearchV {
                 tvGo.setVisibility(View.GONE);
             }
             return true;
+        }
+    };
+
+    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String columnSlug = searchView.getQuery().toString();
+            mPresenter.searchColumn(columnSlug);
         }
     };
 }
