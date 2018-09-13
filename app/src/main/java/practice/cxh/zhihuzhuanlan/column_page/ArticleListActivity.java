@@ -111,6 +111,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         tvDescription.setText(mColumnEntity.getDescription());
         mPresenter = new ArticleListPagePresenter(this);
         mPresenter.loadArticleList(mColumnEntity.getSlug(), 0);
+        swipeRefresh.setRefreshing(true);
     }
 
     @Override
@@ -159,6 +160,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     @Override
     public void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld) {
+        swipeRefresh.setRefreshing(false);
         if (clearOld) {
             mArticleEntityList.clear();
         }
