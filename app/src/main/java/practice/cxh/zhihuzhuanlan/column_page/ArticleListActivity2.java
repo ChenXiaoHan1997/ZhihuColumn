@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -83,6 +84,8 @@ public class ArticleListActivity2 extends AppCompatActivity {
         swipeRefresh = findViewById(R.id.swipe_refresh);
         rvArticles = findViewById(R.id.rv_articles);
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
+        // 取消动画避免列表项闪烁
+        ((SimpleItemAnimator)rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
     }
 
     private void registerListenerAndReceiver() {
@@ -146,6 +149,7 @@ public class ArticleListActivity2 extends AppCompatActivity {
                 finish();
                 break;
             case R.id.download:
+                // TODO 启动下载页
 //                ArticleDownloadActivity.launch(this, mDataSource);
                 break;
             default:
