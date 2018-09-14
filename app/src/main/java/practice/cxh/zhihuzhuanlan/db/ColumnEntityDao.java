@@ -30,6 +30,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
         public final static Property Description = new Property(3, String.class, "description", false, "DESCRIPTION");
         public final static Property FollowersCount = new Property(4, int.class, "followersCount", false, "FOLLOWERS_COUNT");
         public final static Property PostsCount = new Property(5, int.class, "postsCount", false, "POSTS_COUNT");
+        public final static Property Subscribed = new Property(6, boolean.class, "subscribed", false, "SUBSCRIBED");
     }
 
 
@@ -50,7 +51,8 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
                 "\"AVATAR\" TEXT," + // 2: avatar
                 "\"DESCRIPTION\" TEXT," + // 3: description
                 "\"FOLLOWERS_COUNT\" INTEGER NOT NULL ," + // 4: followersCount
-                "\"POSTS_COUNT\" INTEGER NOT NULL );"); // 5: postsCount
+                "\"POSTS_COUNT\" INTEGER NOT NULL ," + // 5: postsCount
+                "\"SUBSCRIBED\" INTEGER NOT NULL );"); // 6: subscribed
     }
 
     /** Drops the underlying database table. */
@@ -84,6 +86,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
         }
         stmt.bindLong(5, entity.getFollowersCount());
         stmt.bindLong(6, entity.getPostsCount());
+        stmt.bindLong(7, entity.getSubscribed() ? 1L: 0L);
     }
 
     @Override
@@ -111,6 +114,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
         }
         stmt.bindLong(5, entity.getFollowersCount());
         stmt.bindLong(6, entity.getPostsCount());
+        stmt.bindLong(7, entity.getSubscribed() ? 1L: 0L);
     }
 
     @Override
@@ -126,7 +130,8 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // avatar
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // description
             cursor.getInt(offset + 4), // followersCount
-            cursor.getInt(offset + 5) // postsCount
+            cursor.getInt(offset + 5), // postsCount
+            cursor.getShort(offset + 6) != 0 // subscribed
         );
         return entity;
     }
@@ -139,6 +144,7 @@ public class ColumnEntityDao extends AbstractDao<ColumnEntity, String> {
         entity.setDescription(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setFollowersCount(cursor.getInt(offset + 4));
         entity.setPostsCount(cursor.getInt(offset + 5));
+        entity.setSubscribed(cursor.getShort(offset + 6) != 0);
      }
     
     @Override

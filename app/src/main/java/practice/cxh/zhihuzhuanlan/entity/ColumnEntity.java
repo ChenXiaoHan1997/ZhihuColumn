@@ -19,27 +19,24 @@ public class ColumnEntity implements Serializable {
     private String description;
     private int followersCount;
     private int postsCount;
+    private boolean subscribed;
 
-
-
-
-    @Generated(hash = 1305861907)
+    @Generated(hash = 2121095600)
     public ColumnEntity(String slug, String name, String avatar,
-            String description, int followersCount, int postsCount) {
+            String description, int followersCount, int postsCount,
+            boolean subscribed) {
         this.slug = slug;
         this.name = name;
         this.avatar = avatar;
         this.description = description;
         this.followersCount = followersCount;
         this.postsCount = postsCount;
+        this.subscribed = subscribed;
     }
 
     @Generated(hash = 119934664)
     public ColumnEntity() {
     }
-
-
-
 
     public static ColumnEntity convertFromColumn(Column column) {
         ColumnEntity columnEntity = new ColumnEntity();
@@ -71,7 +68,7 @@ public class ColumnEntity implements Serializable {
     public String getAvatar() {
         return avatar;
     }
-
+    
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
@@ -98,5 +95,17 @@ public class ColumnEntity implements Serializable {
 
     public void setPostsCount(int postsCount) {
         this.postsCount = postsCount;
+    }
+
+    public boolean isSubscribed() {
+        return subscribed;
+    }
+
+    public void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
+    }
+
+    public boolean getSubscribed() {
+        return this.subscribed;
     }
 }
