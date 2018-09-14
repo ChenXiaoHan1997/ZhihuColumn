@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import practice.cxh.zhihuzhuanlan.DataCore;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.search_page.SearchActivity;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         DbUtil.getColumnEntityDao().detachAll();
+        DataCore.getInstance().setFirstRun(false);
         super.onDestroy();
     }
 
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         mPresenter = new MainpagePresenter(this);
-        mPresenter.loadColums();
+        mPresenter.loadSubscribedColumns();
     }
 
     @Override
