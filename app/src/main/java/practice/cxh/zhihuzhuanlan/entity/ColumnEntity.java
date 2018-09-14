@@ -8,6 +8,7 @@ import java.io.Serializable;
 import practice.cxh.zhihuzhuanlan.bean.Column;
 import practice.cxh.zhihuzhuanlan.util.StringUtil;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class ColumnEntity implements Serializable {
@@ -19,19 +20,18 @@ public class ColumnEntity implements Serializable {
     private String description;
     private int followersCount;
     private int postsCount;
+    @Transient
     private boolean subscribed;
 
-    @Generated(hash = 2121095600)
+    @Generated(hash = 1305861907)
     public ColumnEntity(String slug, String name, String avatar,
-            String description, int followersCount, int postsCount,
-            boolean subscribed) {
+            String description, int followersCount, int postsCount) {
         this.slug = slug;
         this.name = name;
         this.avatar = avatar;
         this.description = description;
         this.followersCount = followersCount;
         this.postsCount = postsCount;
-        this.subscribed = subscribed;
     }
 
     @Generated(hash = 119934664)
@@ -98,7 +98,7 @@ public class ColumnEntity implements Serializable {
     }
 
     public boolean isSubscribed() {
-        return subscribed;
+        return this.subscribed;
     }
 
     public void setSubscribed(boolean subscribed) {

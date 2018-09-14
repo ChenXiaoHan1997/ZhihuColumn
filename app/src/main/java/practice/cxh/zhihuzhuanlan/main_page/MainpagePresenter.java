@@ -87,6 +87,13 @@ public class MainpagePresenter {
                                 public void run() {
                                     Column column = JsonUtil.decodeColumn(response);
                                     final ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
+                                    SubscribeEntity tmp = DbUtil.getSubscribeEntityDao()
+                                            .queryBuilder()
+                                            .where(SubscribeEntityDao.Properties.ColumnSlug.eq(columnSlug))
+                                            .unique();
+                                    if (tmp != null && tmp.getSubscribed()) {
+                                        columnEntity.setSubscribed(true);
+                                    }
                                     mUiHandler.post(new Runnable() {
                                         @Override
                                         public void run() {
@@ -128,6 +135,13 @@ public class MainpagePresenter {
                         .list();
                 if (columnEntityList.size() > 0) {
                     final ColumnEntity columnEntity = columnEntityList.get(0);
+                    SubscribeEntity tmp = DbUtil.getSubscribeEntityDao()
+                            .queryBuilder()
+                            .where(SubscribeEntityDao.Properties.ColumnSlug.eq(columnSlug))
+                            .unique();
+                    if (tmp != null && tmp.getSubscribed()) {
+                        columnEntity.setSubscribed(true);
+                    }
                     mUiHandler.post(new Runnable() {
                         @Override
                         public void run() {

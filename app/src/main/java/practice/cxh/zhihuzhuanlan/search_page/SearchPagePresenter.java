@@ -4,8 +4,11 @@ import android.os.Handler;
 import android.os.Looper;
 
 import practice.cxh.zhihuzhuanlan.bean.Column;
+import practice.cxh.zhihuzhuanlan.db.SubscribeEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.entity.SubscribeEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
+import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
@@ -19,7 +22,7 @@ public class SearchPagePresenter {
         this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
-    public void searchColumn(String columnSlug) {
+    public void searchColumn(final String columnSlug) {
         HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
                 new HttpUtil.HttpListener<String>() {
                     @Override
@@ -29,6 +32,13 @@ public class SearchPagePresenter {
                             public void run() {
                                 Column column = JsonUtil.decodeColumn(response);
                                 final ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
+                                SubscribeEntity tmp = DbUtil.getSubscribeEntityDao()
+                                        .queryBuilder()
+                                        .where(SubscribeEntityDao.Properties.ColumnSlug.eq(columnSlug))
+                                        .unique();
+                                if (tmp != null && tmp.getSubscribed()) {
+                                    columnEntity.setSubscribed(true);
+                                }
                                 mUiHandler.post(new Runnable() {
                                     @Override
                                     public void run() {

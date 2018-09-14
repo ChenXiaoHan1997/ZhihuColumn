@@ -109,6 +109,8 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
+        btnFollow.setText(mColumnEntity.isSubscribed() ?
+                getString(R.string.unsubscribe) : getString(R.string.subscribe));
         AsyncUtil.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
