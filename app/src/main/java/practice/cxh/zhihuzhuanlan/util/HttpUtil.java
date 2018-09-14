@@ -48,8 +48,7 @@ public class HttpUtil {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         String detail = volleyError == null || volleyError.networkResponse == null?
-                                "": String.format(sContext.getString(R.string.http_error),
-                                volleyError.networkResponse.statusCode);
+                                "": volleyError.networkResponse.statusCode + "";
                         httpListener.onFail(detail);
                     }
                 });

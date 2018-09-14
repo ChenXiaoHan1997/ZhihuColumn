@@ -43,7 +43,7 @@ public class SearchPagePresenter {
                     @Override
                     public void onFail(String statusCode) {
                         if (HttpUtil.ERROR_404_NOT_FOUND.equals(statusCode)) {
-
+                            mSearchV.onColumnNotFound();
                         }
                     }
                 });

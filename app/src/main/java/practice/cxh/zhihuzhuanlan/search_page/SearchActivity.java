@@ -112,7 +112,11 @@ public class SearchActivity extends AppCompatActivity implements SearchV {
 
     @Override
     public void onColumnNotFound() {
-
+        mColumnEntityList.clear();
+        rvColumns.setVisibility(View.VISIBLE);
+        tvGo.setVisibility(View.VISIBLE);
+        tvGo.setText(R.string.column_not_found);
+        mAdapter.notifyDataSetChanged();
     }
 
     private SearchView.OnQueryTextListener mQueryTextListener = new SearchView.OnQueryTextListener() {
