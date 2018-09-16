@@ -28,12 +28,39 @@ public class HttpUtil {
     private static Context sContext;
     private static RequestQueue sRequestQueue;
 
+    private RequestQueue mRequestQueue;
+
+    public HttpUtil(Context context) {
+        this.mRequestQueue = Volley.newRequestQueue(context);
+    }
+
     public static void init(Application application) {
         sContext = application;
         sRequestQueue = Volley.newRequestQueue(sContext);
     }
 
-    public static void get(String url, final HttpListener<String> httpListener) {
+    public void get(String url, final HttpListener<String> httpListener) {
+        StringRequest request = new StringRequest(Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        httpListener.onSuccess(s);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        String detail = volleyError == null || volleyError.networkResponse == null?
+                                "": String.format(sContext.getString(R.string.http_error),
+                                volleyError.networkResponse.statusCode);
+                        httpListener.onFail(detail);
+                    }
+                });
+        mRequestQueue.add(request);
+    }
+
+    public static void get0(String url, final HttpListener<String> httpListener) {
         StringRequest request = new StringRequest(Request.Method.GET,
                 url,
                 new Response.Listener<String>() {
@@ -54,7 +81,7 @@ public class HttpUtil {
         sRequestQueue.add(request);
     }
 
-    public static void getBytes(String url, final HttpListener<byte[]> httpListener) {
+    public void getBytes(String url, final HttpListener<byte[]> httpListener) {
         ByteArrayRequest request = new ByteArrayRequest(Request.Method.GET,
                 url,
                 new Response.Listener<byte[]>() {
