@@ -1,5 +1,6 @@
 package practice.cxh.zhihuzhuanlan.column_page;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -21,16 +22,19 @@ public class ArticleListPagePresenter {
 
     private ArticleListV mArticleListV;
     private Handler mUiHandler;
+    private HttpUtil mHttpUtil;
 
-    public ArticleListPagePresenter(ArticleListV articleListV) {
+    public ArticleListPagePresenter(ArticleListV articleListV, Context context) {
         this.mArticleListV = articleListV;
-        mUiHandler = new Handler(Looper.getMainLooper());
+        this.mHttpUtil = new HttpUtil(context);
+        this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     public void loadArticleList(final String columnSlug, final int offset, int limit) {
         // TODO 先从数据库加载
         loadArticleListFromDB(columnSlug, offset, limit, false);
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
+        mArticleListV.showLoading(true);
+        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
                         + "/" + HttpUtil.POSTS + "?offset=" + offset
                         + "&limit=" + limit,
                 new HttpUtil.HttpListener<String>() {
@@ -57,6 +61,7 @@ public class ArticleListPagePresenter {
                                 mUiHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        mArticleListV.showLoading(false);
                                         mArticleListV.onArticleListLoaded(articleEntityList, offset);
                                     }
                                 });

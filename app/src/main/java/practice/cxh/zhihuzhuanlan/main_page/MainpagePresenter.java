@@ -21,12 +21,14 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 public class MainpagePresenter {
     private MainActivity mActivity;
     private Handler mUiHandler;
+    private HttpUtil mHttpUtil;
 
     private String[] columnsSlugs;
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
-        mUiHandler = new Handler(Looper.getMainLooper());
+        this.mHttpUtil = new HttpUtil(activity);
+        this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     /**
@@ -78,7 +80,7 @@ public class MainpagePresenter {
             return;
         }
         for (final String columnSlug : columnsSlugs) {
-            HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
+            mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
                     new HttpUtil.HttpListener<String>() {
                         @Override
                         public void onSuccess(final String response) {

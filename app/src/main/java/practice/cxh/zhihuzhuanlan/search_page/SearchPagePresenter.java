@@ -1,5 +1,6 @@
 package practice.cxh.zhihuzhuanlan.search_page;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -16,14 +17,16 @@ public class SearchPagePresenter {
 
     private SearchV mSearchV;
     private Handler mUiHandler;
+    private HttpUtil mHttpUtil;
 
-    public SearchPagePresenter(SearchV searchV) {
+    public SearchPagePresenter(SearchV searchV, Context context) {
         this.mSearchV = searchV;
+        this.mHttpUtil = new HttpUtil(context);
         this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     public void searchColumn(final String columnSlug) {
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
+        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {

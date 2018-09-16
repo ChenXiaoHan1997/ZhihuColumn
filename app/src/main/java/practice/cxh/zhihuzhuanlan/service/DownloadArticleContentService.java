@@ -30,12 +30,20 @@ public class DownloadArticleContentService extends IntentService {
     private static final int CMD_DOWNLOAD_ARTICLE = 0;
     private static final int CMD_DOWNLOAD_PICS = 1;
 
+    private HttpUtil mHttpUtil;
+
     public DownloadArticleContentService(String name) {
         super(name);
     }
 
     public DownloadArticleContentService() {
         super(NAME);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        this.mHttpUtil = new HttpUtil(this);
     }
 
     public static void downloadArticleContent(Activity activity, String articleSlug) {
@@ -62,7 +70,7 @@ public class DownloadArticleContentService extends IntentService {
             case CMD_DOWNLOAD_ARTICLE:
                 final String articleSlug = intent.getStringExtra(ARTICLE_SLUG);
                 Log.d("tag1", "try download " + articleSlug);
-                HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
+                mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
                         new HttpUtil.HttpListener<String>() {
                             @Override
                             public void onSuccess(String response) {
@@ -91,7 +99,7 @@ public class DownloadArticleContentService extends IntentService {
         List<String> imageUrls = HtmlUtil.getWebImages(html);
         for (final String url : imageUrls) {
             Log.d("tag1", "try download image: " + url);
-            HttpUtil.getBytes(url, new HttpUtil.HttpListener<byte[]>() {
+            mHttpUtil.getBytes(url, new HttpUtil.HttpListener<byte[]>() {
                 @Override
                 public void onSuccess(byte[] data) {
                     Log.d("tag1", "-----succeed in downloading: " + url);

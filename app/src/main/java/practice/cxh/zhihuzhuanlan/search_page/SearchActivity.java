@@ -76,7 +76,7 @@ public class SearchActivity extends AppCompatActivity implements SearchV {
     }
 
     private void initData() {
-        mPresenter = new SearchPagePresenter(this);
+        mPresenter = new SearchPagePresenter(this, this);
     }
 
     @Override

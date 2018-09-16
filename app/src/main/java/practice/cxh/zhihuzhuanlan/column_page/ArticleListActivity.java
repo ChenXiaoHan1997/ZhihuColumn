@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -91,6 +92,8 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         swipeRefresh = findViewById(R.id.swipe_refresh);
         rvArticles = findViewById(R.id.rv_articles);
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
+        // 取消动画避免列表项闪烁
+        ((SimpleItemAnimator)rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
         mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
         rvArticles.setAdapter(mAdapter);
     }
@@ -122,8 +125,9 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
-        mPresenter = new ArticleListPagePresenter(this);
+        mPresenter = new ArticleListPagePresenter(this, this);
         mPresenter.loadArticleList(mColumnEntity.getSlug(), 0, FIRST_LOAD_LIMIT);
+//        swipeRefresh.setRefreshing(true);
     }
 
     @Override
@@ -172,6 +176,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     @Override
     public void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld) {
+//        swipeRefresh.setRefreshing(false);
         if (clearOld) {
             mArticleEntityList.clear();
         }
@@ -210,6 +215,11 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 });
             }
         });
+    }
+
+    @Override
+    public void showLoading(boolean loading) {
+        swipeRefresh.setRefreshing(loading);
     }
 
     private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {

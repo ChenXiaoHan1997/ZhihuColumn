@@ -30,6 +30,7 @@
         </activity>
         <activity
             android:name=".column_page.ArticleListActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
             android:name=".column_page.ArticleDownloadActivity"
@@ -37,6 +38,7 @@
         <activity
             android:name=".article_page.ArticleContentActivity"
             android:launchMode="singleTop"
+            android:theme="@style/TransparentStatusBarTheme"
             android:screenOrientation="portrait" />
         <activity android:name=".search_page.SearchActivity"
             android:launchMode="singleTop"
