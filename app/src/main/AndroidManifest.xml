@@ -38,7 +38,6 @@
         <activity
             android:name=".article_page.ArticleContentActivity"
             android:launchMode="singleTop"
-            android:theme="@style/TransparentStatusBarTheme"
             android:screenOrientation="portrait" />
 
         <service android:name=".service.DownloadArticleContentService" />
