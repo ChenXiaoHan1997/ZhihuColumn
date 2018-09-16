@@ -1,4 +1,4 @@
-package practice.cxh.zhihuzhuanlan;
+package practice.cxh.zhihuzhuanlan.util;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;

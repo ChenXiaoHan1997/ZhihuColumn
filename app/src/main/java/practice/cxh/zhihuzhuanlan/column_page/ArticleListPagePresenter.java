@@ -19,12 +19,12 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class ArticleListPagePresenter {
 
-    private ArticleListV mArticleListV;
+    private IArticleListV mArticleListV;
     private Handler mUiHandler;
     private HttpUtil mHttpUtil;
 
-    public ArticleListPagePresenter(ArticleListV articleListV, Context context) {
-        this.mArticleListV = articleListV;
+    public ArticleListPagePresenter(IArticleListV IArticleListV, Context context) {
+        this.mArticleListV = IArticleListV;
         this.mHttpUtil = new HttpUtil(context);
         this.mUiHandler = new Handler();
     }

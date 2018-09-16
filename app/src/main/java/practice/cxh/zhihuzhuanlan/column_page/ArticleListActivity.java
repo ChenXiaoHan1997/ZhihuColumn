@@ -30,14 +30,14 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.Constants;
-import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
+import practice.cxh.zhihuzhuanlan.util.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
-public class ArticleListActivity extends AppCompatActivity implements ArticleListV {
+public class ArticleListActivity extends AppCompatActivity implements IArticleListV {
 
     public static String COLUMN_ENTITY = "column_entity";
 
