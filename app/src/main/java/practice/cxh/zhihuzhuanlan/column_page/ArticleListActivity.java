@@ -114,7 +114,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
-        mPresenter = new ArticleListPagePresenter(this);
+        mPresenter = new ArticleListPagePresenter(this, this);
         mPresenter.loadArticleList(mColumnEntity.getSlug(), 0, FIRST_LOAD_LIMIT);
     }
 

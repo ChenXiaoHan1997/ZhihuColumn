@@ -16,12 +16,14 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 public class MainpagePresenter {
     private MainActivity mActivity;
     private Handler mUiHandler;
+    private HttpUtil mHttpUtil;
 
     private String[] columnsSlugs = new String[]{"zhaohaoyang", "542b2333", "maqianzu", "diqiuzhishiju", "c_134408063", "h4cj250", "baitouwengkezhan", "stormzhang", "huizi", "kaede", "zhangjiawei", "hehehe"};
 
     public MainpagePresenter(MainActivity activity) {
         this.mActivity = activity;
-        mUiHandler = new Handler(mActivity.getMainLooper());
+        this.mHttpUtil = new HttpUtil(activity);
+        this.mUiHandler = new Handler(mActivity.getMainLooper());
     }
 
     /**
@@ -29,7 +31,7 @@ public class MainpagePresenter {
      */
     public void loadColums() {
         for (final String columnSlug : columnsSlugs) {
-            HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
+            mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
                     new HttpUtil.HttpListener<String>() {
                         @Override
                         public void onSuccess(final String response) {

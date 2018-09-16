@@ -26,17 +26,19 @@ public class ArticleContentPagePresenter {
     private boolean mLoadedFromNet;
 
     private ArticleContentActivity mActivity;
+    private HttpUtil mHttpUtil;
     private Handler mUiHandler;
 
     public ArticleContentPagePresenter(ArticleContentActivity activity) {
         this.mActivity = activity;
-        mUiHandler = new Handler(mActivity.getMainLooper());
+        this.mHttpUtil = new HttpUtil(activity);
+        this.mUiHandler = new Handler(mActivity.getMainLooper());
     }
 
     public void loadArticleContent(final String articleSlug) {
         // 首先加载本地的数据
         loadArticleContentLocal(articleSlug);
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
+        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {
