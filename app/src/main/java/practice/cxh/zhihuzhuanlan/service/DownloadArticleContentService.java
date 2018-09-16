@@ -82,7 +82,7 @@ public class DownloadArticleContentService extends IntentService {
                             }
 
                             @Override
-                            public void onFail(String detail) {
+                            public void onFail(String statusCode) {
                                 notifyForeground(articleSlug, false);
                             }
                         });
@@ -109,7 +109,7 @@ public class DownloadArticleContentService extends IntentService {
                 }
 
                 @Override
-                public void onFail(String detail) {
+                public void onFail(String statusCode) {
 
                 }
             });

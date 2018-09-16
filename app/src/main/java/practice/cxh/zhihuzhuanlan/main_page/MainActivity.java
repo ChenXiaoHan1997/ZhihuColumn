@@ -6,12 +6,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import practice.cxh.zhihuzhuanlan.DataCore;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.search_page.SearchActivity;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         DbUtil.getColumnEntityDao().detachAll();
+        DataCore.getInstance().setFirstRun(false);
         super.onDestroy();
     }
 
@@ -51,7 +56,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         mPresenter = new MainpagePresenter(this);
-        mPresenter.loadColums();
+        mPresenter.loadSubscribedColumns();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_page, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search:
+                SearchActivity.launch(this);
+                break;
+        }
+        return true;
     }
 
     public void onColumnLoaded(ColumnEntity columnEntity) {

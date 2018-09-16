@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.column_page;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -26,7 +27,7 @@ public class ArticleListPagePresenter {
     public ArticleListPagePresenter(IArticleListV IArticleListV, Context context) {
         this.mArticleListV = IArticleListV;
         this.mHttpUtil = new HttpUtil(context);
-        this.mUiHandler = new Handler();
+        this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     public void loadArticleList(final String columnSlug, final int offset, int limit) {
@@ -70,8 +71,7 @@ public class ArticleListPagePresenter {
                     }
 
                     @Override
-                    public void onFail(String detail) {
-                        mArticleListV.showLoading(false);
+                    public void onFail(String statusCode) {
                         loadArticleListFromDB(columnSlug);
                     }
                 });

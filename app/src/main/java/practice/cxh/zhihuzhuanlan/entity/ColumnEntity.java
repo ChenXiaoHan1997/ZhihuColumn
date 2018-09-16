@@ -8,6 +8,7 @@ import java.io.Serializable;
 import practice.cxh.zhihuzhuanlan.bean.Column;
 import practice.cxh.zhihuzhuanlan.util.StringUtil;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class ColumnEntity implements Serializable {
@@ -19,9 +20,8 @@ public class ColumnEntity implements Serializable {
     private String description;
     private int followersCount;
     private int postsCount;
-
-
-
+    @Transient
+    private boolean subscribed;
 
     @Generated(hash = 1305861907)
     public ColumnEntity(String slug, String name, String avatar,
@@ -38,14 +38,11 @@ public class ColumnEntity implements Serializable {
     public ColumnEntity() {
     }
 
-
-
-
     public static ColumnEntity convertFromColumn(Column column) {
         ColumnEntity columnEntity = new ColumnEntity();
         columnEntity.slug = column.getSlug();
         columnEntity.name = column.getName();
-        columnEntity.avatar = StringUtil.getAvatarUrl(column.getAvatar(), "m");
+        columnEntity.avatar = StringUtil.getAvatarUrl(column.getAvatar(), "l");
         columnEntity.description = column.getDescription();
         columnEntity.followersCount = column.getFollowersCount();
         columnEntity.postsCount = column.getPostsCount();
@@ -71,7 +68,7 @@ public class ColumnEntity implements Serializable {
     public String getAvatar() {
         return avatar;
     }
-
+    
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
@@ -98,5 +95,17 @@ public class ColumnEntity implements Serializable {
 
     public void setPostsCount(int postsCount) {
         this.postsCount = postsCount;
+    }
+
+    public boolean isSubscribed() {
+        return this.subscribed;
+    }
+
+    public void setSubscribed(boolean subscribed) {
+        this.subscribed = subscribed;
+    }
+
+    public boolean getSubscribed() {
+        return this.subscribed;
     }
 }

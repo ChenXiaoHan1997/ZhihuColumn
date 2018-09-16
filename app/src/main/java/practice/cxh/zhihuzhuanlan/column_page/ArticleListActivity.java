@@ -19,6 +19,7 @@ import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
     private LinearLayout mHeader;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private TextView tvName;
+    private Button btnFollow;
     private CircleImageView ivAvatar;
     private TextView tvDescription;
     private SwipeRefreshLayout swipeRefresh;
@@ -84,6 +86,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         mHeader = findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         tvName = findViewById(R.id.tv_name);
+        btnFollow = findViewById(R.id.btn_follow);
         ivAvatar = findViewById(R.id.iv_avatar);
         tvDescription = findViewById(R.id.tv_description);
         swipeRefresh = findViewById(R.id.swipe_refresh);
@@ -109,6 +112,14 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
     private void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
+        btnFollow.setText(mColumnEntity.isSubscribed() ?
+                getString(R.string.unsubscribe) : getString(R.string.subscribe));
+        AsyncUtil.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
         Glide.with(this)
                 .load(mColumnEntity.getAvatar())
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--<item-->
+        <!--android:id="@+id/more"-->
+        <!--android:icon="@drawable/ic_action_more_vert"-->
+        <!--app:showAsAction="always"-->
+        <!--android:title="@string/more"/>-->
+    <item
+        android:id="@+id/search"
+        android:title="@string/search_column"
+        app:showAsAction="never" />
+</menu>
