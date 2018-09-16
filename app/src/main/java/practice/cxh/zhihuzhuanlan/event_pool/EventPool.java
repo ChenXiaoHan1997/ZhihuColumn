@@ -23,27 +23,33 @@ public class EventPool {
 //        lsnEvnMap = new HashMap<>();
     }
 
-    public void addListener(String eventId, IEventListener listener) {
-        if (!evnLsnMap.containsKey(eventId)) {
-            evnLsnMap.put(eventId, new ArrayList<IEventListener>());
+    public void addListener(String eventType, IEventListener listener) {
+        if (!evnLsnMap.containsKey(eventType)) {
+            evnLsnMap.put(eventType, new ArrayList<IEventListener>());
         }
-        List<IEventListener> listenerList = evnLsnMap.get(eventId);
+        List<IEventListener> listenerList = evnLsnMap.get(eventType);
         if (!listenerList.contains(listener)) {
             listenerList.add(listener);
         }
     }
 
-    public void removeListener(String eventId, IEventListener listener) {
-        if (!evnLsnMap.containsKey(eventId)) {
+    public void removeListener(IEventListener listener) {
+        for (String eventType : evnLsnMap.keySet()) {
+            removeListener(eventType, listener);
+        }
+    }
+
+    public void removeListener(String eventType, IEventListener listener) {
+        if (!evnLsnMap.containsKey(eventType)) {
             return;
         }
-        List<IEventListener> listenerList = evnLsnMap.get(eventId);
+        List<IEventListener> listenerList = evnLsnMap.get(eventType);
         if (listener == null || !listenerList.contains(listener)) {
             return;
         }
         listenerList.remove(listener);
         if (listenerList.size() == 0) {
-            evnLsnMap.remove(eventId);
+            evnLsnMap.remove(eventType);
         }
     }
 

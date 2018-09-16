@@ -17,8 +17,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,6 +33,11 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.Constants;
+import practice.cxh.zhihuzhuanlan.entity.SubscribeEntity;
+import practice.cxh.zhihuzhuanlan.event_pool.EventPool;
+import practice.cxh.zhihuzhuanlan.event_pool.IEvent;
+import practice.cxh.zhihuzhuanlan.event_pool.IEventListener;
+import practice.cxh.zhihuzhuanlan.event_pool.event.SubscribeEvent;
 import practice.cxh.zhihuzhuanlan.util.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
@@ -107,6 +114,8 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         // 注册监听后台下载广播
         IntentFilter intentFilter = new IntentFilter(Constants.BC_DOWNLOAD_FINISH);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDownloadFinishReicever, intentFilter);
+        btnFollow.setOnClickListener(mBtnClickListener);
+        EventPool.getInstace().addListener(SubscribeEvent.TYPE, mSubscribeListener);
     }
 
     private void initData() {
@@ -138,6 +147,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
 
     @Override
     protected void onDestroy() {
+        EventPool.getInstace().removeListener(SubscribeEvent.TYPE, mSubscribeListener);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
         DbUtil.getArticleEntityDao().detachAll();
         super.onDestroy();
@@ -273,6 +283,33 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
                 }
             }
 //            mAdapter.notifyDataSetChanged();
+        }
+    };
+
+    private View.OnClickListener mBtnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            mPresenter.setSubscribe(mColumnEntity.getSlug(), !mColumnEntity.isSubscribed());
+        }
+    };
+
+    private IEventListener mSubscribeListener = new IEventListener() {
+        @Override
+        public void onEvent(IEvent event) {
+            switch(event.getType()) {
+                case SubscribeEvent.TYPE:
+                    final SubscribeEvent subscribeEvent = (SubscribeEvent) event;
+                    if (mColumnEntity.getSlug().equals(subscribeEvent.getColumnSlug())) {
+                        mColumnEntity.setSubscribed(subscribeEvent.isSubscribe());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                btnFollow.setSelected(subscribeEvent.isSubscribe());
+                            }
+                        });
+                        break;
+                    }
+            }
         }
     };
 }

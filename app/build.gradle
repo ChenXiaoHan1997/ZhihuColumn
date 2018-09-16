@@ -22,7 +22,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 greendao {
-    schemaVersion 13
+    schemaVersion 14
     daoPackage 'practice.cxh.zhihuzhuanlan.db'
     targetGenDir 'src/main/java'
 }
