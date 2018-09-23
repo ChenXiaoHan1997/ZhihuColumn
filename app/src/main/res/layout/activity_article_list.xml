@@ -49,10 +49,12 @@
                     <Button
                         android:id="@+id/btn_follow"
                         android:layout_width="80dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="30sp"
                         android:layout_marginRight="12dp"
                         android:layout_toLeftOf="@id/iv_avatar"
-                        android:padding="6dp"
+                        android:gravity="center"
+                        android:padding="2dp"
+                        android:background="@drawable/btn_subscribe_seletor"
                         android:textSize="14sp" />
 
                     <TextView

@@ -100,7 +100,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         rvArticles = findViewById(R.id.rv_articles);
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
         // 取消动画避免列表项闪烁
-        ((SimpleItemAnimator)rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
+        ((SimpleItemAnimator) rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
         mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
         rvArticles.setAdapter(mAdapter);
     }
@@ -121,14 +121,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
     private void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
-        btnFollow.setText(mColumnEntity.isSubscribed() ?
-                getString(R.string.unsubscribe) : getString(R.string.subscribe));
-        AsyncUtil.getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
+        setBtnSelected(mColumnEntity.isSubscribed());
         Glide.with(this)
                 .load(mColumnEntity.getAvatar())
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
@@ -232,6 +225,12 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         swipeRefresh.setRefreshing(loading);
     }
 
+    private void setBtnSelected(boolean isSubscribe) {
+        btnFollow.setSelected(isSubscribe);
+        btnFollow.setText(isSubscribe ?
+                R.string.unsubscribe : R.string.subscribe);
+    }
+
     private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
         @Override
         public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -296,7 +295,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
     private IEventListener mSubscribeListener = new IEventListener() {
         @Override
         public void onEvent(IEvent event) {
-            switch(event.getType()) {
+            switch (event.getType()) {
                 case SubscribeEvent.TYPE:
                     final SubscribeEvent subscribeEvent = (SubscribeEvent) event;
                     if (mColumnEntity.getSlug().equals(subscribeEvent.getColumnSlug())) {
@@ -304,7 +303,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                btnFollow.setSelected(subscribeEvent.isSubscribe());
+                                setBtnSelected(mColumnEntity.isSubscribed());
                             }
                         });
                         break;

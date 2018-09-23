@@ -39,7 +39,7 @@ public class SearchPagePresenter {
                                         .queryBuilder()
                                         .where(SubscribeEntityDao.Properties.ColumnSlug.eq(columnSlug))
                                         .unique();
-                                if (tmp != null && tmp.getSubscribed()) {
+                                if (tmp != null && tmp.isSubscribed()) {
                                     columnEntity.setSubscribed(true);
                                 }
                                 mUiHandler.post(new Runnable() {
