@@ -15,6 +15,7 @@ import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.DataCore;
 import practice.cxh.zhihuzhuanlan.R;
+import practice.cxh.zhihuzhuanlan.base.ZhihuActivity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.event_pool.EventPool;
 import practice.cxh.zhihuzhuanlan.event_pool.IEvent;
@@ -23,9 +24,7 @@ import practice.cxh.zhihuzhuanlan.event_pool.event.SubscribeEvent;
 import practice.cxh.zhihuzhuanlan.search_page.SearchActivity;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
-public class MainActivity extends AppCompatActivity {
-
-    private MainpagePresenter mPresenter;
+public class MainActivity extends ZhihuActivity<MainpageV, MainpagePresenter> implements MainpageV {
 
     private RecyclerView rvColumns;
     private Toolbar toolbar;
@@ -34,22 +33,12 @@ public class MainActivity extends AppCompatActivity {
     private List<ColumnEntity> mColumnEntityList = new ArrayList<>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initView();
-        registerListenerAndReceiver();
-        initData();
+    protected MainpagePresenter createPresenter() {
+        return new MainpagePresenter(this);
     }
 
     @Override
-    protected void onDestroy() {
-        DbUtil.getColumnEntityDao().detachAll();
-        DataCore.getInstance().setFirstRun(false);
-        EventPool.getInstace().removeListener(mSubscribeListener);
-        super.onDestroy();
-    }
-
-    private void initView() {
+    protected void initView() {
         setContentView(R.layout.activity_main);
         // 去掉DecorView背景
         getWindow().setBackgroundDrawable(null);
@@ -61,13 +50,31 @@ public class MainActivity extends AppCompatActivity {
         rvColumns.setAdapter(mAdapter);
     }
 
-    private void registerListenerAndReceiver() {
+    @Override
+    protected void initToolbar() {
+
+    }
+
+    @Override
+    protected void registerListenerReceiver() {
         EventPool.getInstace().addListener(SubscribeEvent.TYPE, mSubscribeListener);
     }
 
-    private void initData() {
-        mPresenter = new MainpagePresenter(this);
+    @Override
+    protected void initData() {
         mPresenter.loadSubscribedColumns();
+    }
+
+    @Override
+    protected void unregisterListenerReceiver() {
+        EventPool.getInstace().removeListener(mSubscribeListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DbUtil.getColumnEntityDao().detachAll();
+        DataCore.getInstance().setFirstRun(false);
     }
 
     @Override
