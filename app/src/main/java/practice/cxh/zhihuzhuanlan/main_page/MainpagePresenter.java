@@ -35,7 +35,7 @@ public class MainpagePresenter {
      * 查询已订阅的专栏的slug，再加载专栏
      */
     public void loadSubscribedColumns() {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 // 查询哪些是已订阅的专栏
@@ -81,7 +81,7 @@ public class MainpagePresenter {
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {
-                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                        AsyncUtil.executeAsync(new Runnable() {
                             @Override
                             public void run() {
                                 Column column = JsonUtil.decodeColumn(response);
@@ -127,7 +127,7 @@ public class MainpagePresenter {
     }
 
     private void saveColumnEntity(final ColumnEntity columnEntity) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 DbUtil.getColumnEntityDao().insertOrReplace(columnEntity);
@@ -136,7 +136,7 @@ public class MainpagePresenter {
     }
 
     private void loadColumnEntityFromDB(final String columnSlug) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 List<ColumnEntity> columnEntityList = DbUtil.getColumnEntityDao()
