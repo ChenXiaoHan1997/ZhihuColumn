@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // 去掉DecorView背景
         getWindow().setBackgroundDrawable(null);
-        toolbar = (Toolbar) findViewById(R.id.tb_main);
+        toolbar = findViewById(R.id.tb_main);
         setSupportActionBar(toolbar);
-        rvColumns = (RecyclerView) findViewById(R.id.rv_columns);
+        rvColumns = findViewById(R.id.rv_columns);
         rvColumns.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new ColumnEntityAdapter(this, mColumnEntityList);
         rvColumns.setAdapter(mAdapter);

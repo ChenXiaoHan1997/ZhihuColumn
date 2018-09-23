@@ -117,7 +117,7 @@ public class DownloadArticleContentService extends IntentService {
     }
 
     private void saveArticleContent(final ArticleContent articleContent) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 // 将文章的作者、头像等信息保存到数据库

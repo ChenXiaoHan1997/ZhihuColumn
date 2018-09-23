@@ -43,7 +43,7 @@ public class ArticleContentPagePresenter {
                     @Override
                     public void onSuccess(final String response) {
                         mLoadedFromNet = true;
-                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                        AsyncUtil.executeAsync(new Runnable() {
                             @Override
                             public void run() {
                                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
@@ -73,7 +73,7 @@ public class ArticleContentPagePresenter {
     }
 
     private void saveArticleContent(final ArticleContent articleContent) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 // 将文章的作者、头像等信息保存到数据库
@@ -97,7 +97,7 @@ public class ArticleContentPagePresenter {
     }
 
     private void loadArticleContentLocal(final String articleSlug) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 List<ArticleEntity> articleEntityList = DbUtil.getArticleEntityDao()

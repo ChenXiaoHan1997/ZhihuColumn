@@ -188,7 +188,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     private void refreshArticleList() {
         // TODO 重新加载
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 try {
