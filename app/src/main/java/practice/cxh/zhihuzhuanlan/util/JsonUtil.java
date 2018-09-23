@@ -27,7 +27,6 @@ public class JsonUtil {
     public static List<Article> decodeArticleList(String json) {
         List<Article> articleList = new ArrayList<>();
         json = "{articleList:" + json + "}";
-        Log.d("cxh", json);
         Gson gson = new Gson();
         RawPostListJson rawPostListJson = gson.fromJson(json, RawPostListJson.class);
         if (rawPostListJson != null) {

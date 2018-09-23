@@ -78,7 +78,7 @@ public class FileUtil {
                     writer.close();
                 }
             } catch (IOException e) {
-                Log.e("cxh", "", e);
+
             }
         }
     }
@@ -103,7 +103,7 @@ public class FileUtil {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Log.e("cxh", "", e);
+
                 }
             }
         }
@@ -125,7 +125,7 @@ public class FileUtil {
                     outputStream.close();
                 }
             } catch (IOException e) {
-                Log.e("cxh", "", e);
+
             }
         }
     }

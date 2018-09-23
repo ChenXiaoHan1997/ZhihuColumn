@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onColumnLoaded(ColumnEntity columnEntity) {
-        Log.d("cxh", columnEntity.getName());
         mColumnEntityList.add(columnEntity);
         mAdapter.notifyDataSetChanged();
     }

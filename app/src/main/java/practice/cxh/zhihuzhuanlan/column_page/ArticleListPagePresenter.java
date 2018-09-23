@@ -122,7 +122,6 @@ public class ArticleListPagePresenter {
                             .offset(offset);
                 }
                 final List<ArticleEntity> articleEntityList = queryBuilder.list();
-                Log.d("cxh", articleEntityList.toString());
                 mUiHandler.post(new Runnable() {
                     @Override
                     public void run() {
