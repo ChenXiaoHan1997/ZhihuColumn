@@ -5,6 +5,7 @@ import android.app.Application;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.FileUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
+import practice.cxh.zhihuzhuanlan.util.SharedPrefUtil;
 
 public class ZhihuZhuanlanApplication extends Application {
 
@@ -14,5 +15,6 @@ public class ZhihuZhuanlanApplication extends Application {
         HttpUtil.init(this);
         DbUtil.init(this);
         FileUtil.init(this);
+        SharedPrefUtil.init(this);
     }
 }

@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.column_page;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -12,6 +13,10 @@ import java.util.List;
 import practice.cxh.zhihuzhuanlan.bean.Article;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
+import practice.cxh.zhihuzhuanlan.entity.SubscribeEntity;
+import practice.cxh.zhihuzhuanlan.event_pool.EventPool;
+import practice.cxh.zhihuzhuanlan.event_pool.IEvent;
+import practice.cxh.zhihuzhuanlan.event_pool.event.SubscribeEvent;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
@@ -19,14 +24,14 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
 public class ArticleListPagePresenter {
 
-    private ArticleListV mArticleListV;
+    private IArticleListV mArticleListV;
     private Handler mUiHandler;
     private HttpUtil mHttpUtil;
 
-    public ArticleListPagePresenter(ArticleListV articleListV, Context context) {
-        this.mArticleListV = articleListV;
+    public ArticleListPagePresenter(IArticleListV IArticleListV, Context context) {
+        this.mArticleListV = IArticleListV;
         this.mHttpUtil = new HttpUtil(context);
-        this.mUiHandler = new Handler();
+        this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     public void loadArticleList(final String columnSlug, final int offset, int limit) {
@@ -39,7 +44,7 @@ public class ArticleListPagePresenter {
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {
-                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                        AsyncUtil.executeAsync(new Runnable() {
                             @Override
                             public void run() {
                                 List<Article> articlesList = JsonUtil.decodeArticleList(response);
@@ -70,15 +75,14 @@ public class ArticleListPagePresenter {
                     }
 
                     @Override
-                    public void onFail(String detail) {
-                        mArticleListV.showLoading(false);
+                    public void onFail(String statusCode) {
                         loadArticleListFromDB(columnSlug);
                     }
                 });
     }
 
     private void saveArticleList(final List<ArticleEntity> articleEntityList) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 for (ArticleEntity articleEntity : articleEntityList) {
@@ -106,7 +110,7 @@ public class ArticleListPagePresenter {
      * @param clearOld   清除UI上旧的列表
      */
     private void loadArticleListFromDB(final String columnSlug, final int offset, final int limit, final boolean clearOld) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 QueryBuilder queryBuilder = DbUtil.getArticleEntityDao()
@@ -118,7 +122,6 @@ public class ArticleListPagePresenter {
                             .offset(offset);
                 }
                 final List<ArticleEntity> articleEntityList = queryBuilder.list();
-                Log.d("cxh", articleEntityList.toString());
                 mUiHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -127,6 +130,18 @@ public class ArticleListPagePresenter {
                 });
             }
         });
+    }
 
+    public void setSubscribe(final String columnSlug, final boolean subscribe) {
+        AsyncUtil.executeAsync(new Runnable() {
+            @Override
+            public void run() {
+                SubscribeEntity subscribeEntity = new SubscribeEntity(columnSlug, subscribe);
+                DbUtil.getSubscribeEntityDao()
+                        .insertOrReplace(subscribeEntity);
+                IEvent event = new SubscribeEvent(columnSlug, subscribe);
+                EventPool.getInstace().publishEvent(event);
+            }
+        });
     }
 }

@@ -8,6 +8,8 @@ import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.db.ColumnEntityDao;
 import practice.cxh.zhihuzhuanlan.db.DaoMaster;
 import practice.cxh.zhihuzhuanlan.db.DaoSession;
+import practice.cxh.zhihuzhuanlan.db.SubscribeEntityDao;
+import practice.cxh.zhihuzhuanlan.entity.SubscribeEntity;
 
 public class DbUtil {
 
@@ -16,6 +18,7 @@ public class DbUtil {
     private static DaoSession sDaoSession;
     private static ColumnEntityDao sColumnEntityDao;
     private static ArticleEntityDao sArticleEntityDao;
+    private static SubscribeEntityDao sSubscribeEntityDao;
 
     public static void init(Application application) {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(application, DB_NAME);
@@ -23,6 +26,7 @@ public class DbUtil {
         sDaoSession = new DaoMaster(db).newSession();
         sColumnEntityDao = sDaoSession.getColumnEntityDao();
         sArticleEntityDao = sDaoSession.getArticleEntityDao();
+        sSubscribeEntityDao = sDaoSession.getSubscribeEntityDao();
     }
 
     public static DaoSession getDaoSession() {
@@ -35,5 +39,9 @@ public class DbUtil {
 
     public static ArticleEntityDao getArticleEntityDao() {
         return sArticleEntityDao;
+    }
+
+    public static SubscribeEntityDao getSubscribeEntityDao() {
+        return sSubscribeEntityDao;
     }
 }

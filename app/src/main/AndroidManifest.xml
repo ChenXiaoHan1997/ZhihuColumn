@@ -11,13 +11,6 @@
         android:label="吱呼专栏"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".test.TestActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        </activity>
         <activity
             android:name=".main_page.MainActivity"
             android:launchMode="singleTask"
@@ -37,6 +30,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".article_page.ArticleContentActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity android:name=".search_page.SearchActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 

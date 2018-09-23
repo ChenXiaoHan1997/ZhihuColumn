@@ -51,7 +51,8 @@ public class FileUtil {
             Scanner scanner = new Scanner(manager.open(relativePath));
             StringBuilder builder = new StringBuilder();
             while (scanner.hasNext()) {
-                builder.append(scanner.nextLine());
+                builder.append(scanner.nextLine())
+                        .append("\n");
             }
             return builder.toString();
         } catch (IOException e) {
@@ -77,7 +78,7 @@ public class FileUtil {
                     writer.close();
                 }
             } catch (IOException e) {
-                Log.e("cxh", "", e);
+
             }
         }
     }
@@ -102,7 +103,7 @@ public class FileUtil {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Log.e("cxh", "", e);
+
                 }
             }
         }
@@ -124,7 +125,7 @@ public class FileUtil {
                     outputStream.close();
                 }
             } catch (IOException e) {
-                Log.e("cxh", "", e);
+
             }
         }
     }

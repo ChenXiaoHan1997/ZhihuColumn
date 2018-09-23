@@ -25,6 +25,8 @@ public class HttpUtil {
     public static final String COLUMN = "columns";
     public static final String POSTS = "posts";
 
+    public static final String ERROR_404_NOT_FOUND = "404";
+
     private static Context sContext;
     private static RequestQueue sRequestQueue;
 
@@ -73,8 +75,7 @@ public class HttpUtil {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         String detail = volleyError == null || volleyError.networkResponse == null?
-                                "": String.format(sContext.getString(R.string.http_error),
-                                volleyError.networkResponse.statusCode);
+                                "": volleyError.networkResponse.statusCode + "";
                         httpListener.onFail(detail);
                     }
                 });
@@ -94,8 +95,7 @@ public class HttpUtil {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         String detail = volleyError == null || volleyError.networkResponse == null?
-                                "": String.format(sContext.getString(R.string.http_error),
-                                volleyError.networkResponse.statusCode);
+                                "": volleyError.networkResponse.statusCode + "";
                         httpListener.onFail(detail);
                     }
                 });
@@ -104,6 +104,6 @@ public class HttpUtil {
 
     public interface HttpListener<T> {
         void onSuccess(T response);
-        void onFail(String detail);
+        void onFail(String statusCode);
     }
 }
