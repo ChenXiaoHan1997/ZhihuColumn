@@ -44,7 +44,7 @@ public class ArticleListPagePresenter {
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {
-                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                        AsyncUtil.executeAsync(new Runnable() {
                             @Override
                             public void run() {
                                 List<Article> articlesList = JsonUtil.decodeArticleList(response);
@@ -82,7 +82,7 @@ public class ArticleListPagePresenter {
     }
 
     private void saveArticleList(final List<ArticleEntity> articleEntityList) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 for (ArticleEntity articleEntity : articleEntityList) {
@@ -110,7 +110,7 @@ public class ArticleListPagePresenter {
      * @param clearOld   清除UI上旧的列表
      */
     private void loadArticleListFromDB(final String columnSlug, final int offset, final int limit, final boolean clearOld) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 QueryBuilder queryBuilder = DbUtil.getArticleEntityDao()
@@ -134,7 +134,7 @@ public class ArticleListPagePresenter {
     }
 
     public void setSubscribe(final String columnSlug, final boolean subscribe) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 SubscribeEntity subscribeEntity = new SubscribeEntity(columnSlug, subscribe);
