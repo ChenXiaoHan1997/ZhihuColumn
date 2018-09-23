@@ -134,7 +134,7 @@ public class ArticleListPagePresenter {
     }
 
     public void setSubscribe(final String columnSlug, final boolean subscribe) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 SubscribeEntity subscribeEntity = new SubscribeEntity(columnSlug, subscribe);

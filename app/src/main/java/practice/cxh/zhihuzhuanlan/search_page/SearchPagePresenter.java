@@ -30,7 +30,7 @@ public class SearchPagePresenter {
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {
-                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                        AsyncUtil.executeAsync(new Runnable() {
                             @Override
                             public void run() {
                                 Column column = JsonUtil.decodeColumn(response);
