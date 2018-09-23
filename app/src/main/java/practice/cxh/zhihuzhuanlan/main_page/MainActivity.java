@@ -10,11 +10,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.DataCore;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.event_pool.EventPool;
+import practice.cxh.zhihuzhuanlan.event_pool.IEvent;
+import practice.cxh.zhihuzhuanlan.event_pool.IEventListener;
+import practice.cxh.zhihuzhuanlan.event_pool.event.SubscribeEvent;
 import practice.cxh.zhihuzhuanlan.search_page.SearchActivity;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
+        registerListenerAndReceiver();
         initData();
     }
 
@@ -39,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         DbUtil.getColumnEntityDao().detachAll();
         DataCore.getInstance().setFirstRun(false);
+        EventPool.getInstace().removeListener(mSubscribeListener);
         super.onDestroy();
     }
 
@@ -52,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
         rvColumns.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new ColumnEntityAdapter(this, mColumnEntityList);
         rvColumns.setAdapter(mAdapter);
+    }
+
+    private void registerListenerAndReceiver() {
+        EventPool.getInstace().addListener(SubscribeEvent.TYPE, mSubscribeListener);
     }
 
     private void initData() {
@@ -81,4 +92,33 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
     }
 
+    private IEventListener mSubscribeListener = new IEventListener() {
+        @Override
+        public void onEvent(IEvent event) {
+            switch (event.getType()) {
+                case SubscribeEvent.TYPE:
+                    final SubscribeEvent subscribeEvent = (SubscribeEvent) event;
+                    if (subscribeEvent.isSubscribe()) {
+                        // TODO 使用Presenter请求新订阅的专栏的信息
+                        mPresenter.findSubscribedColumns();
+                        mPresenter.loadColumnBySlug(subscribeEvent.getColumnSlug());
+                    } else {
+                        Iterator<ColumnEntity> iterator = mColumnEntityList.iterator();
+                        while (iterator.hasNext()) {
+                            ColumnEntity columnEntity = iterator.next();
+                            if (columnEntity.getSlug().equals(subscribeEvent.getColumnSlug())) {
+                                iterator.remove();
+                            }
+                        }
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    break;
+            }
+        }
+    };
 }

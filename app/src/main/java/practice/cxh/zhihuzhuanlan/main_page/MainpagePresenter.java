@@ -39,27 +39,7 @@ public class MainpagePresenter {
             @Override
             public void run() {
                 // 查询哪些是已订阅的专栏
-                if (DataCore.getInstance().isFirstRun()) {
-                    // 首次启动时读取文件中默认数据
-                    String followings = FileUtil.readTextFromAssets("subscribe.txt");
-                    columnsSlugs = followings.split("\n");
-                    for (String columnSlug : columnsSlugs) {
-                        SubscribeEntity subscribeEntity = new SubscribeEntity(columnSlug, true);
-                        DbUtil.getSubscribeEntityDao()
-                                .insertOrReplace(subscribeEntity);
-                    }
-                } else {
-                    // 非首次启动时读取数据库的订阅记录
-                    List<SubscribeEntity> subscribeEntityList = DbUtil.getSubscribeEntityDao()
-                            .queryBuilder()
-                            .where(SubscribeEntityDao.Properties.Subscribed.eq(true))
-                            .list();
-                    columnsSlugs = new String[subscribeEntityList.size()];
-                    int i = 0;
-                    for (SubscribeEntity subscribeEntity: subscribeEntityList) {
-                        columnsSlugs[i++] = subscribeEntity.getColumnSlug();
-                    }
-                }
+                findSubscribedColumns();
                 mUiHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -72,6 +52,68 @@ public class MainpagePresenter {
 
     }
 
+    public void findSubscribedColumns() {
+        if (DataCore.getInstance().isFirstRun()) {
+            // 首次启动时读取文件中默认数据
+            String followings = FileUtil.readTextFromAssets("subscribe.txt");
+            columnsSlugs = followings.split("\n");
+            for (String columnSlug : columnsSlugs) {
+                SubscribeEntity subscribeEntity = new SubscribeEntity(columnSlug, true);
+                DbUtil.getSubscribeEntityDao()
+                        .insertOrReplace(subscribeEntity);
+            }
+        } else {
+            // 非首次启动时读取数据库的订阅记录
+            List<SubscribeEntity> subscribeEntityList = DbUtil.getSubscribeEntityDao()
+                    .queryBuilder()
+                    .where(SubscribeEntityDao.Properties.Subscribed.eq(true))
+                    .list();
+            columnsSlugs = new String[subscribeEntityList.size()];
+            int i = 0;
+            for (SubscribeEntity subscribeEntity: subscribeEntityList) {
+                columnsSlugs[i++] = subscribeEntity.getColumnSlug();
+            }
+        }
+    }
+
+    public void loadColumnBySlug(final String columnSlug) {
+        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
+                new HttpUtil.HttpListener<String>() {
+                    @Override
+                    public void onSuccess(final String response) {
+                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                Column column = JsonUtil.decodeColumn(response);
+                                final ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
+                                SubscribeEntity tmp = DbUtil.getSubscribeEntityDao()
+                                        .queryBuilder()
+                                        .where(SubscribeEntityDao.Properties.ColumnSlug.eq(columnSlug))
+                                        .unique();
+                                if (tmp != null && tmp.isSubscribed()) {
+                                    columnEntity.setSubscribed(true);
+                                }
+                                mUiHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // 显示在UI
+                                        mActivity.onColumnLoaded(columnEntity);
+                                    }
+                                });
+                                // 保存到数据库
+                                saveColumnEntity(columnEntity);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFail(String statusCode) {
+                        // 加载失败，读取本地数据
+                        loadColumnEntityFromDB(columnSlug);
+                    }
+                });
+    }
+
     /**
      * 加载所有订阅的专栏
      */
@@ -80,41 +122,7 @@ public class MainpagePresenter {
             return;
         }
         for (final String columnSlug : columnsSlugs) {
-            mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug,
-                    new HttpUtil.HttpListener<String>() {
-                        @Override
-                        public void onSuccess(final String response) {
-                            AsyncUtil.getThreadPool().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Column column = JsonUtil.decodeColumn(response);
-                                    final ColumnEntity columnEntity = ColumnEntity.convertFromColumn(column);
-                                    SubscribeEntity tmp = DbUtil.getSubscribeEntityDao()
-                                            .queryBuilder()
-                                            .where(SubscribeEntityDao.Properties.ColumnSlug.eq(columnSlug))
-                                            .unique();
-                                    if (tmp != null && tmp.isSubscribed()) {
-                                        columnEntity.setSubscribed(true);
-                                    }
-                                    mUiHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            // 显示在UI
-                                            mActivity.onColumnLoaded(columnEntity);
-                                        }
-                                    });
-                                    // 保存到数据库
-                                    saveColumnEntity(columnEntity);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFail(String statusCode) {
-                            // 加载失败，读取本地数据
-                            loadColumnEntityFromDB(columnSlug);
-                        }
-                    });
+            loadColumnBySlug(columnSlug);
         }
     }
 
