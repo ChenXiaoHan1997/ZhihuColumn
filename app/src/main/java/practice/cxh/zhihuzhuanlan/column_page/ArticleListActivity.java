@@ -33,6 +33,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.Constants;
+import practice.cxh.zhihuzhuanlan.base.ZhihuActivity;
 import practice.cxh.zhihuzhuanlan.entity.SubscribeEntity;
 import practice.cxh.zhihuzhuanlan.event_pool.EventPool;
 import practice.cxh.zhihuzhuanlan.event_pool.IEvent;
@@ -45,7 +46,7 @@ import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
-public class ArticleListActivity extends AppCompatActivity implements IArticleListV {
+public class ArticleListActivity extends ZhihuActivity<ArticleListV, ArticleListPagePresenter> implements ArticleListV {
 
     public static String COLUMN_ENTITY = "column_entity";
 
@@ -53,8 +54,6 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
     private static final int FIRST_LOAD_LIMIT = 30;
 
     private ColumnEntity mColumnEntity;
-
-    private ArticleListPagePresenter mPresenter;
 
     private AppBarLayout mAppBar;
     private LinearLayout mHeader;
@@ -77,15 +76,12 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initView();
-        initToolbar();
-        registerListenerAndReceiver();
-        initData();
+    protected ArticleListPagePresenter createPresenter() {
+        return new ArticleListPagePresenter(this);
     }
 
-    private void initView() {
+    @Override
+    protected void initView() {
         setContentView(R.layout.activity_article_list);
         // 去掉DecorView背景
         getWindow().setBackgroundDrawable(null);
@@ -105,7 +101,19 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         rvArticles.setAdapter(mAdapter);
     }
 
-    private void registerListenerAndReceiver() {
+    @Override
+    protected void initToolbar() {
+        toolbar = findViewById(R.id.tb_article_list);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_arrow_back_ios_white);
+        }
+    }
+
+    @Override
+    protected void registerListenerReceiver() {
         // 折叠式标题栏在折叠时显示标题
         mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
         // 文章列表在滑动到最后一项时开始加载
@@ -118,7 +126,8 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         EventPool.getInstace().addListener(SubscribeEvent.TYPE, mSubscribeListener);
     }
 
-    private void initData() {
+    @Override
+    protected void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
         setBtnSelected(mColumnEntity.isSubscribed());
@@ -127,34 +136,22 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
-        mPresenter = new ArticleListPagePresenter(this, this);
-        mPresenter.loadArticleList(mColumnEntity.getSlug(), 0, FIRST_LOAD_LIMIT);
-//        swipeRefresh.setRefreshing(true);
+        tryLoadArticles(0, FIRST_LOAD_LIMIT);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-//        mAdapter.notifyDataSetChanged();
+    protected void unregisterListenerReceiver() {
+        EventPool.getInstace().removeListener(SubscribeEvent.TYPE, mSubscribeListener);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
     }
 
     @Override
     protected void onDestroy() {
-        EventPool.getInstace().removeListener(SubscribeEvent.TYPE, mSubscribeListener);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
-        DbUtil.getArticleEntityDao().detachAll();
         super.onDestroy();
+        DbUtil.getArticleEntityDao().detachAll();
     }
 
-    private void initToolbar() {
-        toolbar = findViewById(R.id.tb_article_list);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_arrow_back_ios_white);
-        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -178,19 +175,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
     }
 
     @Override
-    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld) {
-//        swipeRefresh.setRefreshing(false);
-        if (clearOld) {
-            mArticleEntityList.clear();
-        }
-        int oldSize = mArticleEntityList.size();
-        mArticleEntityList.addAll(articleEntityList);
-        mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
-        mAdapter.notifyItemRangeChanged(oldSize, mArticleEntityList.size() - oldSize);
-    }
-
-    @Override
-    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, int offset) {
+    public void onArticlesLoaded(List<ArticleEntity> articleEntityList, int offset, int limit) {
         int count = Math.min(articleEntityList.size(), mArticleEntityList.size() - offset);
         for (int i = 0; i < count; i++) {
             mArticleEntityList.remove(offset);
@@ -198,6 +183,17 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         mArticleEntityList.addAll(offset, articleEntityList);
         mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
         mAdapter.notifyItemRangeChanged(offset, count);
+        swipeRefresh.setRefreshing(false);
+    }
+
+    @Override
+    public void onArticleLoaded(ArticleEntity articleEntity, int index) {
+
+    }
+
+    private void tryLoadArticles(int offset, int limit) {
+        swipeRefresh.setRefreshing(true);
+        mPresenter.loadArticles(mColumnEntity.getSlug(), offset, limit);
     }
 
     private void refreshArticleList() {
@@ -218,11 +214,6 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
                 });
             }
         });
-    }
-
-    @Override
-    public void showLoading(boolean loading) {
-        swipeRefresh.setRefreshing(loading);
     }
 
     private void setBtnSelected(boolean isSubscribe) {
@@ -247,7 +238,7 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
         public void onLoadMore() {
             mAdapter.setLoadState(ArticleEntityAdapter.LOADING);
             if (mArticleEntityList.size() < mColumnEntity.getPostsCount()) {
-                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size(), LOAD_LIMIT);
+                tryLoadArticles(mArticleEntityList.size(), LOAD_LIMIT);
             } else {
                 mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
             }
@@ -281,7 +272,6 @@ public class ArticleListActivity extends AppCompatActivity implements IArticleLi
                     break;
                 }
             }
-//            mAdapter.notifyDataSetChanged();
         }
     };
 

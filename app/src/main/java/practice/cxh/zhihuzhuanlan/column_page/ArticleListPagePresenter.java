@@ -10,6 +10,7 @@ import org.greenrobot.greendao.query.QueryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import practice.cxh.zhihuzhuanlan.base.BasePresenter;
 import practice.cxh.zhihuzhuanlan.bean.Article;
 import practice.cxh.zhihuzhuanlan.db.ArticleEntityDao;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
@@ -22,22 +23,20 @@ import practice.cxh.zhihuzhuanlan.util.DbUtil;
 import practice.cxh.zhihuzhuanlan.util.HttpUtil;
 import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 
-public class ArticleListPagePresenter {
+public class ArticleListPagePresenter extends BasePresenter<ArticleListV> {
 
-    private IArticleListV mArticleListV;
+    private Context mContext;
     private Handler mUiHandler;
     private HttpUtil mHttpUtil;
 
-    public ArticleListPagePresenter(IArticleListV IArticleListV, Context context) {
-        this.mArticleListV = IArticleListV;
+    public ArticleListPagePresenter(Context context) {
+        this.mContext = context;
         this.mHttpUtil = new HttpUtil(context);
         this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
-    public void loadArticleList(final String columnSlug, final int offset, int limit) {
-        // TODO 先从数据库加载
-        loadArticleListFromDB(columnSlug, offset, limit, false);
-        mArticleListV.showLoading(true);
+    public void loadArticles(final String columnSlug, final int offset, final int limit) {
+        loadArticlesFromDB(columnSlug, offset, limit);
         mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
                         + "/" + HttpUtil.POSTS + "?offset=" + offset
                         + "&limit=" + limit,
@@ -65,8 +64,9 @@ public class ArticleListPagePresenter {
                                 mUiHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        mArticleListV.showLoading(false);
-                                        mArticleListV.onArticleListLoaded(articleEntityList, offset);
+                                        if (getView() != null) {
+                                            getView().onArticlesLoaded(articleEntityList, offset, limit);
+                                        }
                                     }
                                 });
                                 saveArticleList(articleEntityList);
@@ -76,40 +76,12 @@ public class ArticleListPagePresenter {
 
                     @Override
                     public void onFail(String statusCode) {
-                        loadArticleListFromDB(columnSlug);
+
                     }
                 });
     }
 
-    private void saveArticleList(final List<ArticleEntity> articleEntityList) {
-        AsyncUtil.executeAsync(new Runnable() {
-            @Override
-            public void run() {
-                for (ArticleEntity articleEntity : articleEntityList) {
-                    DbUtil.getArticleEntityDao().insertOrReplace(articleEntity);
-                }
-            }
-        });
-    }
-
-    /**
-     * 从数据库中加载所有的文章
-     *
-     * @param columnSlug
-     */
-    private void loadArticleListFromDB(final String columnSlug) {
-        loadArticleListFromDB(columnSlug, 0, -1, true);
-    }
-
-    /**
-     * 从数据库中加载文章
-     *
-     * @param columnSlug 专栏slug
-     * @param offset     偏移
-     * @param limit      最多加载数量
-     * @param clearOld   清除UI上旧的列表
-     */
-    private void loadArticleListFromDB(final String columnSlug, final int offset, final int limit, final boolean clearOld) {
+    private void loadArticlesFromDB(final String columnSlug, final int offset, final int limit) {
         AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
@@ -125,9 +97,22 @@ public class ArticleListPagePresenter {
                 mUiHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mArticleListV.onArticleListLoaded(articleEntityList, clearOld);
+                        if (getView() != null) {
+                            getView().onArticlesLoaded(articleEntityList, offset, limit);
+                        }
                     }
                 });
+            }
+        });
+    }
+
+    private void saveArticleList(final List<ArticleEntity> articleEntityList) {
+        AsyncUtil.executeAsync(new Runnable() {
+            @Override
+            public void run() {
+                for (ArticleEntity articleEntity : articleEntityList) {
+                    DbUtil.getArticleEntityDao().insertOrReplace(articleEntity);
+                }
             }
         });
     }
