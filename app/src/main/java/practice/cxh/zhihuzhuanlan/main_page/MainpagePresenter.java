@@ -46,12 +46,16 @@ public class MainpagePresenter extends BasePresenter<MainpageV> {
                     @Override
                     public void run() {
                         // 开始加载专栏列表
-                        loadColums();
+                        if (columnsSlugs == null) {
+                            return;
+                        }
+                        for (String columnSlug : columnsSlugs) {
+                            loadColumnBySlug(columnSlug);
+                        }
                     }
                 });
             }
         });
-
     }
 
     public void findSubscribedColumns() {
@@ -116,18 +120,6 @@ public class MainpagePresenter extends BasePresenter<MainpageV> {
                         loadColumnEntityFromDB(columnSlug);
                     }
                 });
-    }
-
-    /**
-     * 加载所有订阅的专栏
-     */
-    private void loadColums() {
-        if (columnsSlugs == null) {
-            return;
-        }
-        for (final String columnSlug : columnsSlugs) {
-            loadColumnBySlug(columnSlug);
-        }
     }
 
     private void saveColumnEntity(final ColumnEntity columnEntity) {
