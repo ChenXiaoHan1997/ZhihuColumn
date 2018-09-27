@@ -15,9 +15,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.util.List;
-
-import practice.cxh.zhihuzhuanlan.datasource.AsyncDataSource;
 import practice.cxh.zhihuzhuanlan.datasource.DataSource;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.article_page.ArticleContentActivity;
