@@ -43,7 +43,7 @@ public abstract class PreloadListDataSource<T> extends ListDataSource<T> {
             return;
         }
         Log.d("tag1", "preloadData: start=" + start + ", count=" + count);
-        onPreloadData(start, Math.min(count, maxCount - start + 1));
+        onPreloadData(Math.max(start, mDataList.size()), Math.min(count, maxCount - start + 1));
     }
 
     protected abstract void onPreloadData(int start, int count);
