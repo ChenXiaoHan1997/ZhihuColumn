@@ -1,5 +1,6 @@
 package practice.cxh.zhihuzhuanlan.column_page;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
@@ -24,10 +25,14 @@ import practice.cxh.zhihuzhuanlan.util.JsonUtil;
 public class ArticleEntityDataSource extends PreloadListDataSource<ArticleEntity> {
 
     private String columnSlug;
+    private Context mContext;
+    private HttpUtil mHttpUtil;
 
-    public ArticleEntityDataSource(String columnSlug, int postsCount, RecyclerView.Adapter adapter) {
+    public ArticleEntityDataSource(Context context, String columnSlug, int postsCount, RecyclerView.Adapter adapter) {
         super(postsCount, adapter);
         this.columnSlug = columnSlug;
+        this.mContext = context;
+        this.mHttpUtil = new HttpUtil(mContext);
         init();
     }
 
@@ -35,7 +40,7 @@ public class ArticleEntityDataSource extends PreloadListDataSource<ArticleEntity
     protected void onPreloadData(final int start, final int count) {
         Log.d("tag1", HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
                 + "/" + HttpUtil.POSTS + "?offset=" + start + "&limit=" + count);
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
+        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.COLUMN + "/" + columnSlug
                         + "/" + HttpUtil.POSTS + "?offset=" + start + "&limit=" + count,
                 new HttpUtil.HttpListener<String>() {
                     @Override
@@ -67,7 +72,7 @@ public class ArticleEntityDataSource extends PreloadListDataSource<ArticleEntity
     }
 
     private void loadDataFromDB(final int start, final int count) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 final List<ArticleEntity> articleEntityList = DbUtil.getArticleEntityDao()

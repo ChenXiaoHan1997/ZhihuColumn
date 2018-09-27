@@ -30,12 +30,20 @@ public class DownloadArticleContentService extends IntentService {
     private static final int CMD_DOWNLOAD_ARTICLE = 0;
     private static final int CMD_DOWNLOAD_PICS = 1;
 
+    private HttpUtil mHttpUtil;
+
     public DownloadArticleContentService(String name) {
         super(name);
     }
 
     public DownloadArticleContentService() {
         super(NAME);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        this.mHttpUtil = new HttpUtil(this);
     }
 
     public static void downloadArticleContent(Activity activity, String articleSlug) {
@@ -61,12 +69,10 @@ public class DownloadArticleContentService extends IntentService {
         switch (cmd) {
             case CMD_DOWNLOAD_ARTICLE:
                 final String articleSlug = intent.getStringExtra(ARTICLE_SLUG);
-                Log.d("tag1", "try download " + articleSlug);
-                HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
+                mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
                         new HttpUtil.HttpListener<String>() {
                             @Override
                             public void onSuccess(String response) {
-                                Log.d("tag1", "--------------下载成功");
                                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
                                 notifyForeground(articleSlug, true);
                                 saveArticleContent(articleContent);
@@ -74,7 +80,7 @@ public class DownloadArticleContentService extends IntentService {
                             }
 
                             @Override
-                            public void onFail(String detail) {
+                            public void onFail(String statusCode) {
                                 notifyForeground(articleSlug, false);
                             }
                         });
@@ -90,18 +96,16 @@ public class DownloadArticleContentService extends IntentService {
     private void downloadWebImages(String html) {
         List<String> imageUrls = HtmlUtil.getWebImages(html);
         for (final String url : imageUrls) {
-            Log.d("tag1", "try download image: " + url);
-            HttpUtil.getBytes(url, new HttpUtil.HttpListener<byte[]>() {
+            mHttpUtil.getBytes(url, new HttpUtil.HttpListener<byte[]>() {
                 @Override
                 public void onSuccess(byte[] data) {
-                    Log.d("tag1", "-----succeed in downloading: " + url);
                     String imageFileName = FileUtil.getWebImageFilename(url);
                     FileUtil.saveDataToFile(FileUtil.WEB_IMGAGES_DIR
                                     + File.separator + imageFileName, data);
                 }
 
                 @Override
-                public void onFail(String detail) {
+                public void onFail(String statusCode) {
 
                 }
             });
@@ -109,7 +113,7 @@ public class DownloadArticleContentService extends IntentService {
     }
 
     private void saveArticleContent(final ArticleContent articleContent) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 // 将文章的作者、头像等信息保存到数据库

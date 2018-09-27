@@ -182,6 +182,6 @@ public class ArticleContentActivity extends AppCompatActivity {
 
     @JavascriptInterface
     public void showBigImage() {
-        Log.d("tag1", "show big image: ");
+
     }
 }

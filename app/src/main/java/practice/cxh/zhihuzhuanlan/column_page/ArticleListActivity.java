@@ -17,8 +17,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,14 +30,20 @@ import com.bumptech.glide.request.RequestOptions;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.Constants;
+import practice.cxh.zhihuzhuanlan.entity.SubscribeEntity;
+import practice.cxh.zhihuzhuanlan.event_pool.EventPool;
+import practice.cxh.zhihuzhuanlan.event_pool.IEvent;
+import practice.cxh.zhihuzhuanlan.event_pool.IEventListener;
+import practice.cxh.zhihuzhuanlan.event_pool.event.SubscribeEvent;
+import practice.cxh.zhihuzhuanlan.util.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.datasource.DataSource;
-import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
 
 public class ArticleListActivity extends AppCompatActivity {
+
     public static String COLUMN_ENTITY = "column_entity";
 
     private ColumnEntity mColumnEntity;
@@ -45,6 +54,7 @@ public class ArticleListActivity extends AppCompatActivity {
     private LinearLayout mHeader;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private TextView tvName;
+    private Button btnFollow;
     private CircleImageView ivAvatar;
     private TextView tvDescription;
     private SwipeRefreshLayout swipeRefresh;
@@ -53,9 +63,6 @@ public class ArticleListActivity extends AppCompatActivity {
 
     private ArticleEntityAdapter mAdapter;
     private DataSource<ArticleEntity> mDataSource;
-
-//    private ArticleEntityAdapter mAdapter;
-//    private List<ArticleEntity> mArticleEntityList = new ArrayList<>();
 
     public static void launch(Activity activity, ColumnEntity columnEntity) {
         Intent intent = new Intent(activity, ArticleListActivity.class);
@@ -78,13 +85,14 @@ public class ArticleListActivity extends AppCompatActivity {
         mHeader = findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         tvName = findViewById(R.id.tv_name);
+        btnFollow = findViewById(R.id.btn_follow);
         ivAvatar = findViewById(R.id.iv_avatar);
         tvDescription = findViewById(R.id.tv_description);
         swipeRefresh = findViewById(R.id.swipe_refresh);
         rvArticles = findViewById(R.id.rv_articles);
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
         // 取消动画避免列表项闪烁
-        ((SimpleItemAnimator)rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
+        ((SimpleItemAnimator) rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
     }
 
     private void registerListenerAndReceiver() {
@@ -95,18 +103,23 @@ public class ArticleListActivity extends AppCompatActivity {
         // 注册监听后台下载广播
         IntentFilter intentFilter = new IntentFilter(Constants.BC_DOWNLOAD_FINISH);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDownloadFinishReicever, intentFilter);
+        btnFollow.setOnClickListener(mBtnClickListener);
+        EventPool.getInstace().addListener(SubscribeEvent.TYPE, mSubscribeListener);
     }
 
     private void initData() {
         mColumnEntity = (ColumnEntity) getIntent().getSerializableExtra(COLUMN_ENTITY);
         tvName.setText(mColumnEntity.getName());
+        setBtnSelected(mColumnEntity.isSubscribed());
         Glide.with(this)
                 .load(mColumnEntity.getAvatar())
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
-        mAdapter = new ArticleEntityAdapter(this, rvArticles);
-        mDataSource = new ArticleEntityDataSource(mColumnEntity.getSlug(),
+//        swipeRefresh.setRefreshing(true);
+        mAdapter = new ArticleEntityAdapter(this);
+        mDataSource = new ArticleEntityDataSource(this,
+                mColumnEntity.getSlug(),
                 mColumnEntity.getPostsCount(),
                 mAdapter);
         mAdapter.setDataSource(mDataSource);
@@ -121,6 +134,7 @@ public class ArticleListActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        EventPool.getInstace().removeListener(SubscribeEvent.TYPE, mSubscribeListener);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
         super.onDestroy();
     }
@@ -157,11 +171,9 @@ public class ArticleListActivity extends AppCompatActivity {
         return true;
     }
 
-    // TODO 请求成功回调
-
     private void refreshArticleList() {
         // TODO 重新加载
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -177,6 +189,13 @@ public class ArticleListActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+
+    private void setBtnSelected(boolean isSubscribe) {
+        btnFollow.setSelected(isSubscribe);
+        btnFollow.setText(isSubscribe ?
+                R.string.unsubscribe : R.string.subscribe);
     }
 
     private AppBarLayout.OnOffsetChangedListener mOnOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
@@ -223,6 +242,33 @@ public class ArticleListActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO 接受到广播回调
+        }
+    };
+
+    private View.OnClickListener mBtnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            mPresenter.setSubscribe(mColumnEntity.getSlug(), !mColumnEntity.isSubscribed());
+        }
+    };
+
+    private IEventListener mSubscribeListener = new IEventListener() {
+        @Override
+        public void onEvent(IEvent event) {
+            switch (event.getType()) {
+                case SubscribeEvent.TYPE:
+                    final SubscribeEvent subscribeEvent = (SubscribeEvent) event;
+                    if (mColumnEntity.getSlug().equals(subscribeEvent.getColumnSlug())) {
+                        mColumnEntity.setSubscribed(subscribeEvent.isSubscribe());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setBtnSelected(mColumnEntity.isSubscribed());
+                            }
+                        });
+                        break;
+                    }
+            }
         }
     };
 }

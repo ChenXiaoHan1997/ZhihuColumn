@@ -13,12 +13,7 @@ public class AsyncUtil {
 
     private static ExecutorService sThreadPool = Executors.newFixedThreadPool(CORE_SIZE);
 
-    public static ExecutorService getThreadPool() {
-        return sThreadPool;
-    }
-
     public static void executeAsync(Runnable runnable) {
         sThreadPool.execute(runnable);
     }
-
 }

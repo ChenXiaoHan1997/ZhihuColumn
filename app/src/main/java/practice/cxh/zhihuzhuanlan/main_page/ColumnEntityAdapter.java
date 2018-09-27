@@ -17,6 +17,7 @@ import java.util.List;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.column_page.ArticleListActivity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
+import practice.cxh.zhihuzhuanlan.search_page.SearchActivity;
 
 public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapter.ViewHolder> {
 
@@ -24,16 +25,22 @@ public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapte
     private Context mContext;
 
     private LayoutInflater mLayoutInflater;
+    private int mLayoutResource;
 
     public ColumnEntityAdapter(Context context, List<ColumnEntity> columnEntities) {
         this.mColumnEntities = columnEntities;
         this.mContext = context;
         this.mLayoutInflater = LayoutInflater.from(mContext);
+        if (context instanceof MainActivity) {
+            mLayoutResource = R.layout.item_column;
+        } else if (context instanceof SearchActivity) {
+            mLayoutResource = R.layout.item_search;
+        }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = mLayoutInflater.inflate(R.layout.item_column, parent, false);
+        View itemView = mLayoutInflater.inflate(mLayoutResource, parent, false);
         return new ViewHolder(itemView);
     }
 

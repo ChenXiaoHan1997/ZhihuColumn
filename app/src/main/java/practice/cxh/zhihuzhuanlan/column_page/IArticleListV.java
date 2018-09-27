@@ -4,7 +4,8 @@ import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 
-public interface ArticleListV {
+public interface IArticleListV {
     void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld);
     void onArticleListLoaded(List<ArticleEntity> articleEntityList, int offset);
+    void showLoading(boolean loading);
 }

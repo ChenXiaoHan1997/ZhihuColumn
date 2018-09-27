@@ -25,15 +25,23 @@ public class HttpUtil {
     public static final String COLUMN = "columns";
     public static final String POSTS = "posts";
 
+    public static final String ERROR_404_NOT_FOUND = "404";
+
     private static Context sContext;
     private static RequestQueue sRequestQueue;
+
+    private RequestQueue mRequestQueue;
+
+    public HttpUtil(Context context) {
+        this.mRequestQueue = Volley.newRequestQueue(context);
+    }
 
     public static void init(Application application) {
         sContext = application;
         sRequestQueue = Volley.newRequestQueue(sContext);
     }
 
-    public static void get(String url, final HttpListener<String> httpListener) {
+    public void get(String url, final HttpListener<String> httpListener) {
         StringRequest request = new StringRequest(Request.Method.GET,
                 url,
                 new Response.Listener<String>() {
@@ -51,10 +59,30 @@ public class HttpUtil {
                         httpListener.onFail(detail);
                     }
                 });
+        mRequestQueue.add(request);
+    }
+
+    public static void get0(String url, final HttpListener<String> httpListener) {
+        StringRequest request = new StringRequest(Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        httpListener.onSuccess(s);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        String detail = volleyError == null || volleyError.networkResponse == null?
+                                "": volleyError.networkResponse.statusCode + "";
+                        httpListener.onFail(detail);
+                    }
+                });
         sRequestQueue.add(request);
     }
 
-    public static void getBytes(String url, final HttpListener<byte[]> httpListener) {
+    public void getBytes(String url, final HttpListener<byte[]> httpListener) {
         ByteArrayRequest request = new ByteArrayRequest(Request.Method.GET,
                 url,
                 new Response.Listener<byte[]>() {
@@ -67,8 +95,7 @@ public class HttpUtil {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
                         String detail = volleyError == null || volleyError.networkResponse == null?
-                                "": String.format(sContext.getString(R.string.http_error),
-                                volleyError.networkResponse.statusCode);
+                                "": volleyError.networkResponse.statusCode + "";
                         httpListener.onFail(detail);
                     }
                 });
@@ -77,6 +104,6 @@ public class HttpUtil {
 
     public interface HttpListener<T> {
         void onSuccess(T response);
-        void onFail(String detail);
+        void onFail(String statusCode);
     }
 }

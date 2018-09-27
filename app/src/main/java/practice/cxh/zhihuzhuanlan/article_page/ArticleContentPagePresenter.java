@@ -2,6 +2,7 @@ package practice.cxh.zhihuzhuanlan.article_page;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -26,22 +27,24 @@ public class ArticleContentPagePresenter {
     private boolean mLoadedFromNet;
 
     private ArticleContentActivity mActivity;
+    private HttpUtil mHttpUtil;
     private Handler mUiHandler;
 
     public ArticleContentPagePresenter(ArticleContentActivity activity) {
         this.mActivity = activity;
-        mUiHandler = new Handler(mActivity.getMainLooper());
+        this.mHttpUtil = new HttpUtil(activity);
+        this.mUiHandler = new Handler(Looper.getMainLooper());
     }
 
     public void loadArticleContent(final String articleSlug) {
         // 首先加载本地的数据
         loadArticleContentLocal(articleSlug);
-        HttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
+        mHttpUtil.get(HttpUtil.API_BASE + HttpUtil.POSTS + "/" + articleSlug,
                 new HttpUtil.HttpListener<String>() {
                     @Override
                     public void onSuccess(final String response) {
                         mLoadedFromNet = true;
-                        AsyncUtil.getThreadPool().execute(new Runnable() {
+                        AsyncUtil.executeAsync(new Runnable() {
                             @Override
                             public void run() {
                                 ArticleContent articleContent = JsonUtil.decodeArticleContent(response);
@@ -62,7 +65,7 @@ public class ArticleContentPagePresenter {
                     }
 
                     @Override
-                    public void onFail(String detail) {
+                    public void onFail(String statusCode) {
                         if (!mLoadedFromLocal && !mLoadedFromNet) {
                             mActivity.onArticleContentLoadFail();
                         }
@@ -71,7 +74,7 @@ public class ArticleContentPagePresenter {
     }
 
     private void saveArticleContent(final ArticleContent articleContent) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 // 将文章的作者、头像等信息保存到数据库
@@ -95,7 +98,7 @@ public class ArticleContentPagePresenter {
     }
 
     private void loadArticleContentLocal(final String articleSlug) {
-        AsyncUtil.getThreadPool().execute(new Runnable() {
+        AsyncUtil.executeAsync(new Runnable() {
             @Override
             public void run() {
                 List<ArticleEntity> articleEntityList = DbUtil.getArticleEntityDao()

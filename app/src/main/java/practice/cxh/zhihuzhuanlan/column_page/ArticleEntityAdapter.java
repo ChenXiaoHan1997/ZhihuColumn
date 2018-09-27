@@ -34,7 +34,7 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private LayoutInflater mLayoutInflater;
 
-    public ArticleEntityAdapter(Context context, RecyclerView recyclerView) {
+    public ArticleEntityAdapter(Context context) {
         this.mContext = context;
         this.mLayoutInflater = LayoutInflater.from(mContext);
     }
