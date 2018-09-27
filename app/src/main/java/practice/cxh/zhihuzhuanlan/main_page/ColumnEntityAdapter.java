@@ -16,7 +16,6 @@ import java.util.List;
 
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.column_page.ArticleListActivity;
-import practice.cxh.zhihuzhuanlan.column_page.ArticleListActivity2;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 
 public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapter.ViewHolder> {
@@ -44,7 +43,7 @@ public class ColumnEntityAdapter extends RecyclerView.Adapter<ColumnEntityAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArticleListActivity2.launch((Activity) mContext, columnEntity);
+                ArticleListActivity.launch((Activity) mContext, columnEntity);
             }
         });
         holder.tvName.setText(columnEntity.getName());

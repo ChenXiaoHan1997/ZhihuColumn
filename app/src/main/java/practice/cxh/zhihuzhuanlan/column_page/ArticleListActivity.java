@@ -25,24 +25,17 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import practice.cxh.zhihuzhuanlan.Constants;
+import practice.cxh.zhihuzhuanlan.datasource.DataSource;
 import practice.cxh.zhihuzhuanlan.EndlessRecyclerOnScrollListener;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
 import practice.cxh.zhihuzhuanlan.entity.ColumnEntity;
 import practice.cxh.zhihuzhuanlan.util.AsyncUtil;
-import practice.cxh.zhihuzhuanlan.util.DbUtil;
 
-public class ArticleListActivity extends AppCompatActivity implements ArticleListV {
-
+public class ArticleListActivity extends AppCompatActivity {
     public static String COLUMN_ENTITY = "column_entity";
-
-    private static final int LOAD_LIMIT = 10;
-    private static final int FIRST_LOAD_LIMIT = 30;
 
     private ColumnEntity mColumnEntity;
 
@@ -59,7 +52,10 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private Toolbar toolbar;
 
     private ArticleEntityAdapter mAdapter;
-    private List<ArticleEntity> mArticleEntityList = new ArrayList<>();
+    private DataSource<ArticleEntity> mDataSource;
+
+//    private ArticleEntityAdapter mAdapter;
+//    private List<ArticleEntity> mArticleEntityList = new ArrayList<>();
 
     public static void launch(Activity activity, ColumnEntity columnEntity) {
         Intent intent = new Intent(activity, ArticleListActivity.class);
@@ -78,8 +74,6 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
 
     private void initView() {
         setContentView(R.layout.activity_article_list);
-        // 去掉DecorView背景
-        getWindow().setBackgroundDrawable(null);
         mAppBar = findViewById(R.id.app_bar);
         mHeader = findViewById(R.id.ll_header);
         mCollapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
@@ -91,15 +85,12 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         rvArticles.setLayoutManager(new LinearLayoutManager(this));
         // 取消动画避免列表项闪烁
         ((SimpleItemAnimator)rvArticles.getItemAnimator()).setSupportsChangeAnimations(false);
-        mAdapter = new ArticleEntityAdapter(this, mArticleEntityList);
-        rvArticles.setAdapter(mAdapter);
     }
 
     private void registerListenerAndReceiver() {
         // 折叠式标题栏在折叠时显示标题
         mAppBar.addOnOffsetChangedListener(mOnOffsetChangedListener);
-        // 文章列表在滑动到最后一项时开始加载
-        rvArticles.addOnScrollListener(mEndlessRecyclerOnScrollListener);
+
         swipeRefresh.setOnRefreshListener(mRefreshListener);
         // 注册监听后台下载广播
         IntentFilter intentFilter = new IntentFilter(Constants.BC_DOWNLOAD_FINISH);
@@ -114,8 +105,12 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 .apply(new RequestOptions().placeholder(R.drawable.liukanshan))
                 .into(ivAvatar);
         tvDescription.setText(mColumnEntity.getDescription());
-        mPresenter = new ArticleListPagePresenter(this);
-        mPresenter.loadArticleList(mColumnEntity.getSlug(), 0, FIRST_LOAD_LIMIT);
+        mAdapter = new ArticleEntityAdapter(this, rvArticles);
+        mDataSource = new ArticleEntityDataSource(mColumnEntity.getSlug(),
+                mColumnEntity.getPostsCount(),
+                mAdapter);
+        mAdapter.setDataSource(mDataSource);
+        rvArticles.setAdapter(mAdapter);
     }
 
     @Override
@@ -127,7 +122,6 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadFinishReicever);
-        DbUtil.getArticleEntityDao().detachAll();
         super.onDestroy();
     }
 
@@ -154,7 +148,8 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
                 finish();
                 break;
             case R.id.download:
-                ArticleDownloadActivity.launch(this, mArticleEntityList);
+                // TODO 启动下载页
+//                ArticleDownloadActivity.launch(this, mDataSource);
                 break;
             default:
                 break;
@@ -162,27 +157,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
         return true;
     }
 
-    @Override
-    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, boolean clearOld) {
-        if (clearOld) {
-            mArticleEntityList.clear();
-        }
-        int oldSize = mArticleEntityList.size();
-        mArticleEntityList.addAll(articleEntityList);
-        mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
-        mAdapter.notifyItemRangeChanged(oldSize, mArticleEntityList.size() - oldSize);
-    }
-
-    @Override
-    public void onArticleListLoaded(List<ArticleEntity> articleEntityList, int offset) {
-        int count = Math.min(articleEntityList.size(), mArticleEntityList.size() - offset);
-        for (int i = 0; i < count; i++) {
-            mArticleEntityList.remove(offset);
-        }
-        mArticleEntityList.addAll(offset, articleEntityList);
-        mAdapter.setLoadState(ArticleEntityAdapter.LOADING_COMPLETE);
-        mAdapter.notifyItemRangeChanged(offset, count);
-    }
+    // TODO 请求成功回调
 
     private void refreshArticleList() {
         // TODO 重新加载
@@ -218,12 +193,12 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
         @Override
         public void onLoadMore() {
-            mAdapter.setLoadState(ArticleEntityAdapter.LOADING);
-            if (mArticleEntityList.size() < mColumnEntity.getPostsCount()) {
-                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size(), LOAD_LIMIT);
-            } else {
-                mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
-            }
+//            mAdapter.setLoadState(ArticleEntityAdapter.LOADING);
+//            if (mAdapter.getLastPosition() < mColumnEntity.getPostsCount()) {
+//                mPresenter.loadArticleList(mColumnEntity.getSlug(), mArticleEntityList.size());
+//            } else {
+//                mAdapter.setLoadState(ArticleEntityAdapter.LOADING_END);
+//            }
         }
 
         @Override
@@ -247,14 +222,7 @@ public class ArticleListActivity extends AppCompatActivity implements ArticleLis
     private BroadcastReceiver mDownloadFinishReicever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String slug = intent.getStringExtra(Constants.BC_SLUG);
-            for (int i = mArticleEntityList.size() - 1; i >= 0; i--) {
-                if (mArticleEntityList.get(i).getSlug().equals(slug)) {
-                    mAdapter.notifyItemChanged(i);
-                    break;
-                }
-            }
-//            mAdapter.notifyDataSetChanged();
+            // TODO 接受到广播回调
         }
     };
 }

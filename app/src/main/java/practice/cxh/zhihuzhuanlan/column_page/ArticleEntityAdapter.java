@@ -1,6 +1,7 @@
 package practice.cxh.zhihuzhuanlan.column_page;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,8 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
+import practice.cxh.zhihuzhuanlan.datasource.AsyncDataSource;
+import practice.cxh.zhihuzhuanlan.datasource.DataSource;
 import practice.cxh.zhihuzhuanlan.R;
 import practice.cxh.zhihuzhuanlan.article_page.ArticleContentActivity;
 import practice.cxh.zhihuzhuanlan.entity.ArticleEntity;
@@ -23,35 +26,26 @@ import practice.cxh.zhihuzhuanlan.util.TimeUtil;
 
 public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public static final int LOADING = 0;
-    public static final int LOADING_COMPLETE = 1;
-    public static final int LOADING_END = 2;
-
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_FOOTER = 1;
 
-    private int mLoadState;
-
-    private List<ArticleEntity> mArticleEntities;
+    private DataSource<ArticleEntity> mDataSource;
     private Context mContext;
 
     private LayoutInflater mLayoutInflater;
 
-    public ArticleEntityAdapter(Context context, List<ArticleEntity> articleEntities) {
+    public ArticleEntityAdapter(Context context, RecyclerView recyclerView) {
         this.mContext = context;
-        this.mArticleEntities = articleEntities;
-        this.mLoadState = LOADING_COMPLETE;
         this.mLayoutInflater = LayoutInflater.from(mContext);
     }
 
+    public void setDataSource(DataSource dataSource) {
+        this.mDataSource = dataSource;
+    }
 
     @Override
     public int getItemViewType(int position) {
-        if (position + 1 == getItemCount()) {
-            return TYPE_FOOTER;
-        } else {
-            return TYPE_ITEM;
-        }
+        return TYPE_ITEM;
     }
 
     @NonNull
@@ -69,10 +63,11 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof ItemViewHolder) {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-            final ArticleEntity articleEntity = mArticleEntities.get(position);
+            final ArticleEntity articleEntity = mDataSource.getDataAt(position);
+
             switch (articleEntity.getDownloadState()) {
                 case ArticleEntity.DOWNLOAD_SUCCESS:
                     itemViewHolder.tvState.setText(mContext.getString(R.string.downloaded));
@@ -104,35 +99,14 @@ public class ArticleEntityAdapter extends RecyclerView.Adapter<RecyclerView.View
                     ArticleContentActivity.launch((Activity) mContext, articleEntity);
                 }
             });
-
-        } else if (holder instanceof FooterViewHolder) {
-            FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
-            switch (mLoadState) {
-                case LOADING:
-                    footerViewHolder.tvLoading.setVisibility(View.VISIBLE);
-                    footerViewHolder.tvLoadEnd.setVisibility(View.GONE);
-                    break;
-                case LOADING_COMPLETE:
-                    footerViewHolder.tvLoading.setVisibility(View.INVISIBLE);
-                    footerViewHolder.tvLoadEnd.setVisibility(View.INVISIBLE);
-                    break;
-                case LOADING_END:
-                    footerViewHolder.tvLoading.setVisibility(View.GONE);
-                    footerViewHolder.tvLoadEnd.setVisibility(View.VISIBLE);
-                    break;
-            }
         }
-    }
-
-    public void setLoadState(int loadState) {
-        this.mLoadState = loadState;
-        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return mArticleEntities.size() + 1;
+        return mDataSource.getItemCount();
     }
+
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
