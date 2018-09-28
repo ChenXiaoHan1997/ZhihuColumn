@@ -163,7 +163,7 @@ public class ArticleListActivity extends AppCompatActivity {
                 break;
             case R.id.download:
                 // TODO 启动下载页
-//                ArticleDownloadActivity.launch(this, mDataSource);
+                ArticleDownloadActivity.launch(this, mDataSource.getDataWithRange(0, mDataSource.getItemCount()));
                 break;
             default:
                 break;

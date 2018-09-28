@@ -22,6 +22,14 @@ public abstract class ListDataSource<T> implements DataSource<T> {
 
     @Override
     public List<T> getDataWithRange(int start, int count) {
-        return null;
+        List<T> dataList = new ArrayList<>();
+        start = Math.max(start, 0);
+        int end = Math.min(start + count, mDataList.size());
+        if (start < end) {
+            for (int i = start; i < end; i++) {
+                dataList.add(mDataList.get(i));
+            }
+        }
+        return dataList;
     }
 }
