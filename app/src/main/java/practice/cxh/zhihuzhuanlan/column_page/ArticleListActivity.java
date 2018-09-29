@@ -124,6 +124,7 @@ public class ArticleListActivity extends AppCompatActivity {
                 mAdapter);
         mAdapter.setDataSource(mDataSource);
         rvArticles.setAdapter(mAdapter);
+        mPresenter = new ArticleListPagePresenter(this);
     }
 
     @Override
